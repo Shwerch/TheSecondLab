@@ -5,7 +5,7 @@ int main() {
     std::cin >> num;
     for (int i = 1; i <= num; i++) {
         for (int j = 1; j <= i; j++)
-            std::cout << (char)(num - j + ((int) 'A')) << " ";
+            std::cout << static_cast<char>(num - j + static_cast<int>('A')) << " ";
         std::cout << std::endl;
     }
     return 0;
