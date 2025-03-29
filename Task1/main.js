@@ -1,14 +1,5 @@
-const readline = require('readline');
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 function main() {
-    rl.question('Enter a number: ', (input) => {
-        const num = parseInt(input);
-    }
+    const num = Number(prompt("Enter a number:"));
     
     for (let i = 1; i <= num; i++) {
         let line = '';
@@ -19,3 +10,5 @@ function main() {
         console.log(line.trim());
     }
 }
+
+main();
