@@ -1,5 +1,5 @@
 
-num = int(input("Enter a number: "))
+num = int(input("Enter the N number: "))
 
 for i in range(1, num + 1):
     line = ''

@@ -1,5 +1,5 @@
 function main() {
-    const num = Number(prompt("Enter a number:"));
+    const num = Number(prompt("Enter the N number: "));
     
     for (let i = 1; i <= num; i++) {
         let line = '';

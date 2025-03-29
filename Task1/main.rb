@@ -1,4 +1,5 @@
 def main
+    print "Enter the N number: "
     num = gets.to_i
     
     (1..num).each do |i|

@@ -1,6 +1,7 @@
 import java.util.Scanner
 
 fun main() {
+    print("Enter the N number: ")
     val scanner = Scanner(System.`in`)
     val num = scanner.nextInt()
     scanner.close()

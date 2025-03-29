@@ -1,4 +1,5 @@
 <?php
+echo "Enter the N number: ";
 $num = intval(fgets(STDIN));
 
 for ($i = 1; $i <= $num; $i++) {

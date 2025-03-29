@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) {
+        System.out.print("Enter the N number: ");
         Scanner scanner = new Scanner(System.in);
         int num = scanner.nextInt();
         scanner.close();

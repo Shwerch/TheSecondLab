@@ -6,6 +6,7 @@ import (
 
 func main() {
 	var num int
+	fmt.Printf("Enter the N number: ")
 	fmt.Scan(&num)
 
 	for i := 1; i <= num; i++ {
