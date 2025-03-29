@@ -3,7 +3,7 @@ msg:
   .ascii "Enter the N number: "
   .set msg_len, . - msg
 buffer:
-  .space 10
+  .space 2
 
 .text
 .globl _start
@@ -21,13 +21,17 @@ input:
   mov $buffer, %rsi
   mov $10, %rdx
   syscall
+  mov $buffer, %rax
+  and $0xF, %rax
+  movq $0, %r8
+  addq %rax, %r8
   ret
 
 output:
   mov $1, %rax
   mov $1, %rdi
-  mov $buffer, %rsi
-  mov $10, %rdx
+  mov (%r8), %rsi
+  mov $1, %rdx
   syscall
   ret
 
