@@ -8,13 +8,13 @@ j:      .space 4         # Reserve space for loop variable j
 
 _start:
     # Read integer from stdin
-    mov $rax, 0           # syscall: sys_read
-    mov $rdi, 0           # file descriptor: stdin
+    mov rax, 0           # syscall: sys_read
+    mov rdi, 0           # file descriptor: stdin
     lea rsi, [num]       # buffer to store input
     mov rdx, 4           # number of bytes to read
     syscall
 
-    # Convert input string to integer (assume valid input)
+    # Convert input string to integer (assuming valid input)
     mov rax, [num]       # Load the address of num
     sub rax, '0'         # Convert ASCII to integer (only works for single digit)
     mov [num], rax       # Store the integer back in num
@@ -33,18 +33,20 @@ inner_loop:
     cmp eax, [num]       # Compare i with num
     jg end_outer_loop    # If i > num, exit outer loop
 
-    # Inner loop: j from 1 to i
-    mov dword ptr [j], 1
+    # Print characters from 'A' + (num - i) down to 'A'
+    mov dword ptr [j], 0 # Initialize j = 0
 
 print_inner_loop:
     mov eax, [j]         # Load j
     cmp eax, [i]         # Compare j with i
-    jg end_inner_loop    # If j > i, exit inner loop
+    jge end_inner_loop   # If j >= i, exit inner loop
 
-    # Calculate character to print: num - j + 'A'
+    # Calculate character to print: 'A' + (num - i) - j
     mov eax, [num]
+    sub eax, [i]
     sub eax, [j]
     add eax, 'A'         # Convert to character
+
     call print_char      # Call print_char function
 
     ; Print space after character
@@ -61,7 +63,7 @@ end_inner_loop:
     ; Print newline after inner loop
     mov rax, 1           # syscall: sys_write
     mov rdi, 1           # file descriptor: stdout
-    lea rsi, [newline]    # address of newline character
+    lea rsi, [newline]     # address of newline character
     mov rdx, 1           # number of bytes to write
     syscall
 
