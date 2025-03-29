@@ -7,7 +7,10 @@ import (
 func main() {
 	var num int
 	fmt.Printf("Enter the N number: ")
-	fmt.Scan(&num)
+	_, err := fmt.Scan(&num)
+	if err != nil {
+		return
+	}
 
 	for i := 1; i <= num; i++ {
 		for j := 1; j <= i; j++ {

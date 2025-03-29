@@ -8,4 +8,3 @@ for ($i = 1; $i <= $num; $i++) {
     }
     echo PHP_EOL;
 }
-?>
