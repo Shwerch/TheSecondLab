@@ -9,6 +9,8 @@ sys_write=1
 sys_read=0
 sys_exit=60
 
+inputRegister=%rsp
+
 firstDigit=%r8b
 secondDigit=%r9b
 
@@ -130,13 +132,13 @@ _start:
   # Ввод числа как массива INPUT_SIZE символов в %rsp
   movq $sys_read, %rax
   movq $STDIN, %rdi
-  movq %rsp, %rsi
+  movq inputRegister, %rsi
   movq $2048, %rdx
   syscall
 
   # Перемещение символов в разные регистры
-  movb 0(%rsp), firstDigit
-  movb 1(%rsp), secondDigit
+  movb 0(inputRegister), firstDigit
+  movb 1(inputRegister), secondDigit
   
   # Определение, сколько цифр были введено и запись результата в numberQuad
   movq $0, numberQuad
