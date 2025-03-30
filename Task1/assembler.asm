@@ -32,18 +32,24 @@ LETTERS:
 .globl _start
 
 oneDigit:
+  # Конвертация символа из %r8b в еденицы числа
   subb $DIGIT_NUMBER_DIFFERENCE, %r8b
   movb %r8b, %r10b
+
   jmp digitFunctionEnd
 
 twoDigits:
-  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
+  # Конвертация символа из %r9b в еденицы числа
   subb $DIGIT_NUMBER_DIFFERENCE, %r9b
   movb %r9b, %r10b
+
+  # Конвертация символа из %r8b в десятки числа
+  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
   movb %r8b, %al
   movb $10, %r12b
   mulb %r12b
   addw %ax, %r10w
+  
   jmp digitFunctionEnd
 
 printHelloMessage:
