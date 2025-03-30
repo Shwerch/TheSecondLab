@@ -9,6 +9,10 @@ sys_write=1
 sys_read=0
 sys_exit=60
 
+numberByte=%r10b
+numberWord=%r10w
+numberQuad=%r10
+
 iStart=0
 iLimit=%r8
 i=%r9
@@ -16,6 +20,8 @@ i=%r9
 jStart=0
 jLimit=%r10
 j=%r13
+
+letter=%r14
 
 .data
 MESSAGE:
@@ -34,22 +40,22 @@ LETTERS:
 oneDigit:
   # Конвертация символа из %r8b в еденицы числа
   subb $DIGIT_NUMBER_DIFFERENCE, %r8b
-  movb %r8b, %r10b
+  movb %r8b, numberByte
 
   jmp digitFunctionEnd
 
 twoDigits:
   # Конвертация символа из %r9b в еденицы числа
   subb $DIGIT_NUMBER_DIFFERENCE, %r9b
-  movb %r9b, %r10b
+  movb %r9b, numberByte
 
   # Конвертация символа из %r8b в десятки числа
   subb $DIGIT_NUMBER_DIFFERENCE, %r8b
   movb %r8b, %al
   movb $10, %r12b
   mulb %r12b
-  addw %ax, %r10w
-  
+  addw %ax, numberWord
+
   jmp digitFunctionEnd
 
 printHelloMessage:
@@ -59,7 +65,6 @@ printHelloMessage:
   movq $MESSAGE_LEN, %rdx
   syscall
   ret
-
 
 printSpace:
   movq $sys_write, %rax
@@ -77,24 +82,18 @@ printNewLine:
   syscall
   ret
 
-# Код символа берется из %r14
+# Код символа берется из letter
 printLetter:
   movq $sys_write, %rax
   movq $STDOUT, %rdi
   movq $LETTERS, %rsi
-  addq %r14, %rsi
+  addq letter, %rsi
   movq $1, %rdx
   syscall
   ret
 
 _start:
-  # Сохранение начального состояния %rsp в %rbp
-  movq %rsp, %rbp
-  
   call printHelloMessage
-
-  # Выделение INPUT_SIZE байт в стеке
-  subq $INPUT_SIZE, %rsp
   
   # Ввод числа как массива INPUT_SIZE символов в %rsp
   movq $sys_read, %rax
@@ -107,14 +106,22 @@ _start:
   movb 0(%rsp), %r8b
   movb 1(%rsp), %r9b
   
-  # Определение, сколько цифр были введено и запись результата в %r10b
+  # Определение, сколько цифр были введено и запись результата в numberQuad
   cmpb $10, %r9b
   je oneDigit
   jmp twoDigits
   digitFunctionEnd:
 
+  # Проверка числа на корректность
+  cmpb $1, numberByte
+  jb exit
+  halfCheck:
+  cmpb $28, numberByte
+  ja exit
+  numberCheckEnd:
+
   # Объявление первого цикла с i
-  movq %r10, iLimit
+  movq numberQuad, iLimit
   movq $iStart, i
   firstLoop:
 
@@ -125,9 +132,9 @@ _start:
     secondLoop:
       
       # Рассчет кодов символов для вывода буквы
-      movq iLimit, %r14
-      subq j, %r14
-      subq $1, %r14
+      movq iLimit, letter
+      subq j, letter
+      subq $1, letter
       
       call printLetter
 
@@ -151,10 +158,13 @@ _start:
 
   jmp exit
 
-exit:
-  # Восстановление %rsp (освобождение стека)
-  movq %rbp, %rsp
+error:
+  # Завершение работы программы с ошибкой ввода-вывода 
+  movq $sys_exit, %rax
+  movq $5, %rdi
+  syscall
 
+exit:
   # Завершение работы программы
   movq $sys_exit, %rax
   movq $0, %rdi
