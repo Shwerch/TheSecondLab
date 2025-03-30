@@ -2,47 +2,78 @@
 msg:
   .ascii "Enter the N number: "
   .set msg_len, . - msg
-buffer:
-  .space 2
+system:
+  .ascii "'"
+  .set system_len, . - system
+first:
+  .quad 0
+second:
+  .quad 0
 
 .text
 .globl _start
 
 notice:
-  mov $1, %rax
-  mov $msg, %rsi
-  mov $msg_len, %rdx
+  movq $1, %rax
+  movq $msg, %rsi
+  movq $msg_len, %rdx
   syscall
   ret
 
 input:
-  mov $0, %rax
-  mov $0, %rdi
-  mov $buffer, %rsi
-  mov $10, %rdx
+  movq $0, %rax
+  movq $0, %rdi
+  movq $first, %rsi
+  movq $1, %rdx
   syscall
-  mov $buffer, %rax
-  and $0xF, %rax
-  movq $0, %r8
-  addq %rax, %r8
+  
+  movq $0, %rax
+  movq $0, %rdi
+  movq $second, %rsi
+  movq $1, %rdx
+  syscall
+
+  movq $second, %r8
+  movq $10, %r9
+  cmpq %r8, %r9
+  je exit
+
   ret
 
 output:
-  mov $1, %rax
-  mov $1, %rdi
-  mov (%r8), %rsi
-  mov $1, %rdx
+  movq $1, %rax
+  movq $1, %rdi
+  movq $system, %rsi
+  movq $system_len, %rdx
+  syscall
+
+  movq $1, %rax
+  movq $1, %rdi
+  movq $first, %rsi
+  movq $2, %rdx
+  syscall
+
+  movq $1, %rax
+  movq $1, %rdi
+  movq $second, %rsi
+  movq $2, %rdx
+  syscall
+  
+  movq $1, %rax
+  movq $1, %rdi
+  movq $system, %rsi
+  movq $system_len, %rdx
   syscall
   ret
 
 _start:
-  mov $1, %rdi
+  movq $1, %rdi
   call notice
   call input
   call output
   jmp exit
 
 exit:
-  mov $60, %rax
-  xor %rdi, %rdi
+  movq $60, %rax
+  movq $0, %rdi
   syscall
