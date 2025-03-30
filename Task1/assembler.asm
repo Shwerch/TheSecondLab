@@ -10,33 +10,37 @@ sys_write=1
 sys_read=0
 sys_exit=60
 
-numberRegister=%r10b
-
 iStart=0
-iLimit=%r8b
-i=%r9b
+iLimit=%r8
+i=%r9
 
 jStart=0
-jLimit=%r10b
-j=%r11b
+jLimit=%r10
+j=%r13
 
 .data
-message:
+MESSAGE:
   .ascii "Enter the N number: "
-  .set message_len, . - message
+  .set MESSAGE_LEN, . - MESSAGE
+SPACE:
+  .ascii " "
+NEWLINE:
+  .ascii "\n"
+LETTERS:
+  .ascii "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 .text
 .globl _start
 
 oneDigit:
   subb $DIGIT_INT_DIFFERENCE, %r8b
-  movb %r8b, numberRegister
+  movb %r8b, %r10b
   jmp digitFunctionEnd
 
 twoDigits:
   subb $DIGIT_INT_DIFFERENCE, %r8b
   subb $DIGIT_INT_DIFFERENCE, %r9b
-  movb %r9b, numberRegister
+  movb %r9b, %r10b
   movb %r8b, %al
   movb $10, %r12b
   mulb %r12b
@@ -50,8 +54,8 @@ _start:
   # Вывод приветственного сообщения
   movq $sys_write, %rax
   movq $STDOUT, %rdi
-  movq $message, %rsi
-  movq $message_len, %rdx
+  movq $MESSAGE, %rsi
+  movq $MESSAGE_LEN, %rdx
   syscall
 
   # Выделение INPUT_SIZE байт в стеке
@@ -61,48 +65,55 @@ _start:
   movq $sys_read, %rax
   movq $STDIN, %rdi
   movq %rsp, %rsi
-  movq $INPUT_SIZE, %rdx
+  movq $2048, %rdx
   syscall
 
   # Перемещение символов в разные регистры
   movb 0(%rsp), %r8b
   movb 1(%rsp), %r9b
   
-  # Определение, сколько цифр были введено и запись результата в numberRegister
+  # Определение, сколько цифр были введено и запись результата в %r10b
   cmpb $10, %r9b
   je oneDigit
   jmp twoDigits
   digitFunctionEnd:
 
   # Объявление первого цикла с i
-  movb numberRegister, iLimit
-  movb $iStart, i
+  movq %r10, iLimit
+  movq $iStart, i
   firstLoop:
 
     # Объявление второго цикла с j
-    movb i, jLimit
-    add $1, jLimit
-    movb $jStart, j
+    movq i, jLimit
+    addq $1, jLimit
+    movq $jStart, j
     secondLoop:
       
       # Рассчет кодов символов для вывода буквы
-      movb iLimit, %r12b
-      subb j, %r12b
-      subb $1, %r12b
-      addb $CHAR_INT_DIFFERENCE, %r12b
-      addw $0xa00, %r12w
+      movq iLimit, %r14
+      subq j, %r14
+      subq $1, %r14
+      # addq $CHAR_INT_DIFFERENCE, %r14
       
       test:
-      # Вывод символ буквы и пробела
+      # Вывод буквы
       movq $sys_write, %rax
       movq $STDOUT, %rdi
-      movq %r12, %rsi
-      movq $2, %rdx
+      movq $LETTERS, %rsi
+      addq %r14, %rsi
+      movq $1, %rdx
+      syscall
+
+      # Вывод пробела
+      movq $sys_write, %rax
+      movq $STDOUT, %rdi
+      movq $SPACE, %rsi
+      movq $1, %rdx
       syscall
 
       # Завершение второго цикла с j
-      addb $1, j
-      cmpb j, jLimit
+      addq $1, j
+      cmpq j, jLimit
       je secondLoopEnd
       jmp secondLoop
     secondLoopEnd:
@@ -110,13 +121,13 @@ _start:
     # Вывод символа конца строки '\n'
     movq $sys_write, %rax
     movq $STDOUT, %rdi
-    movq $'\n', %rsi
+    movq $NEWLINE, %rsi
     movq $1, %rdx
     syscall
 
     # Завершение первого цикла с i
-    addb $1, i
-    cmpb i, iLimit
+    addq $1, i
+    cmpq i, iLimit
     je firstLoopEnd
     jmp firstLoop
   firstLoopEnd:
