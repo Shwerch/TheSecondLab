@@ -9,6 +9,16 @@ sys_write=1
 sys_read=0
 sys_exit=60
 
+numberRegister=%r10b
+
+iStart=1
+iLimit=%r8b
+i=%r9b
+
+jStart=1
+jLimit=%r10b
+j=%r11b
+
 .data
 message:
   .ascii "Enter the N number: "
@@ -57,11 +67,19 @@ _start:
   movb 0(%rsp), %r8b
   movb 1(%rsp), %r9b
   
-  # Определение, сколько цифр были введено и запись результата в %r10
+  # Определение, сколько цифр были введено и запись результата в numberRegister
   cmpb $10, %r9b
   je oneDigit
   jmp twoDigits
   digitFunctionEnd:
+
+
+  movb numberRegister, iLimit
+  movb iStart, i
+  firstLoop:
+    movb %r10b, i
+    subb $1, i
+
 
   jmp exit
 
