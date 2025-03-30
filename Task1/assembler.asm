@@ -1,6 +1,5 @@
 INPUT_SIZE=2
-DIGIT_INT_DIFFERENCE=48
-CHAR_INT_DIFFERENCE=65
+DIGIT_NUMBER_DIFFERENCE=48
 
 STDIN=0
 STDOUT=1
@@ -33,13 +32,13 @@ LETTERS:
 .globl _start
 
 oneDigit:
-  subb $DIGIT_INT_DIFFERENCE, %r8b
+  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
   movb %r8b, %r10b
   jmp digitFunctionEnd
 
 twoDigits:
-  subb $DIGIT_INT_DIFFERENCE, %r8b
-  subb $DIGIT_INT_DIFFERENCE, %r9b
+  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
+  subb $DIGIT_NUMBER_DIFFERENCE, %r9b
   movb %r9b, %r10b
   movb %r8b, %al
   movb $10, %r12b
@@ -47,16 +46,46 @@ twoDigits:
   addw %ax, %r10w
   jmp digitFunctionEnd
 
-_start:
-  # Сохранение начального состояния %rsp в %rbp
-  movq %rsp, %rbp
-  
-  # Вывод приветственного сообщения
+printHelloMessage:
   movq $sys_write, %rax
   movq $STDOUT, %rdi
   movq $MESSAGE, %rsi
   movq $MESSAGE_LEN, %rdx
   syscall
+  ret
+
+
+printSpace:
+  movq $sys_write, %rax
+  movq $STDOUT, %rdi
+  movq $SPACE, %rsi
+  movq $1, %rdx
+  syscall
+  ret
+
+printNewLine:
+  movq $sys_write, %rax
+  movq $STDOUT, %rdi
+  movq $NEWLINE, %rsi
+  movq $1, %rdx
+  syscall
+  ret
+
+# Код символа берется из %r14
+printLetter:
+  movq $sys_write, %rax
+  movq $STDOUT, %rdi
+  movq $LETTERS, %rsi
+  addq %r14, %rsi
+  movq $1, %rdx
+  syscall
+  ret
+
+_start:
+  # Сохранение начального состояния %rsp в %rbp
+  movq %rsp, %rbp
+  
+  call printHelloMessage
 
   # Выделение INPUT_SIZE байт в стеке
   subq $INPUT_SIZE, %rsp
@@ -93,23 +122,10 @@ _start:
       movq iLimit, %r14
       subq j, %r14
       subq $1, %r14
-      # addq $CHAR_INT_DIFFERENCE, %r14
       
-      test:
-      # Вывод буквы
-      movq $sys_write, %rax
-      movq $STDOUT, %rdi
-      movq $LETTERS, %rsi
-      addq %r14, %rsi
-      movq $1, %rdx
-      syscall
+      call printLetter
 
-      # Вывод пробела
-      movq $sys_write, %rax
-      movq $STDOUT, %rdi
-      movq $SPACE, %rsi
-      movq $1, %rdx
-      syscall
+      call printSpace
 
       # Завершение второго цикла с j
       addq $1, j
@@ -118,12 +134,7 @@ _start:
       jmp secondLoop
     secondLoopEnd:
 
-    # Вывод символа конца строки '\n'
-    movq $sys_write, %rax
-    movq $STDOUT, %rdi
-    movq $NEWLINE, %rsi
-    movq $1, %rdx
-    syscall
+    call printNewLine
 
     # Завершение первого цикла с i
     addq $1, i
