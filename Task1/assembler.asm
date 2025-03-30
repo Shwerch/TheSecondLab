@@ -33,7 +33,7 @@ MESSAGE:
   .ascii "Enter the N number: "
   .set MESSAGE_LEN, . - MESSAGE
 ERROR:
-  .ascii "The N number must be from 1 to 28!\n"
+  .ascii "The N number must be from 1 to 26!\n"
   .set ERROR_LEN, . - ERROR
 SPACE:
   .ascii " "
@@ -150,7 +150,7 @@ _start:
   # Проверка числа на корректность
   cmpb $1, numberByte
   jb error
-  cmpb $28, numberByte
+  cmpb $26, numberByte
   ja error
 
   # Объявление первого цикла с i
