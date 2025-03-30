@@ -1,5 +1,6 @@
 INPUT_SIZE=2
-CHAR_INT_DIFFERENCE=0x30
+DIGIT_INT_DIFFERENCE=48
+CHAR_INT_DIFFERENCE=65
 
 STDIN=0
 STDOUT=1
@@ -28,13 +29,13 @@ message:
 .globl _start
 
 oneDigit:
-  subb $CHAR_INT_DIFFERENCE, %r8b
+  subb $DIGIT_INT_DIFFERENCE, %r8b
   movb %r8b, numberRegister
   jmp digitFunctionEnd
 
 twoDigits:
-  subb $CHAR_INT_DIFFERENCE, %r8b
-  subb $CHAR_INT_DIFFERENCE, %r9b
+  subb $DIGIT_INT_DIFFERENCE, %r8b
+  subb $DIGIT_INT_DIFFERENCE, %r9b
   movb %r9b, numberRegister
   movb %r8b, %al
   movb $10, %r12b
@@ -82,9 +83,23 @@ _start:
     add $1, jLimit
     movb jStart, j
     secondLoop:
-      # ?
+      
+      # Рассчет кодов символов для вывода буквы
+      movb iLimit, %r12b
+      subb j, %r12b
+      subb $1, %r12b
+      addb $CHAR_INT_DIFFERENCE, %r12b
+      addw $0xa00, %r12w
+
+      # Вывод символ буквы и пробела
+      movq $sys_write, %rax
+      movq $STDOUT, %rdi
+      movq (%r12), %rsi
+      movq $2, %rdx
+      syscall
+
       # Завершение второго цикла с j
-      addb %1, j
+      addb $1, j
       cmpb j, jLimit
       je secondLoopEnd
       jmp secondLoop
@@ -98,7 +113,7 @@ _start:
     syscall
 
     # Завершение первого цикла с i
-    addb %1, i
+    addb $1, i
     cmpb i, iLimit
     je firstLoopEnd
     jmp firstLoop
