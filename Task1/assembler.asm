@@ -27,6 +27,9 @@ letter=%r14
 MESSAGE:
   .ascii "Enter the N number: "
   .set MESSAGE_LEN, . - MESSAGE
+ERROR:
+  .ascii "The N number must be from 1 to 28!\n"
+  .set ERROR_LEN, . - ERROR
 SPACE:
   .ascii " "
 NEWLINE:
@@ -92,6 +95,14 @@ printLetter:
   syscall
   ret
 
+printError:
+  movq $sys_write, %rax
+  movq $STDOUT, %rdi
+  movq $ERROR, %rsi
+  movq $ERROR_LEN, %rdx
+  syscall
+  ret
+
 _start:
   call printHelloMessage
   
@@ -114,11 +125,9 @@ _start:
 
   # Проверка числа на корректность
   cmpb $1, numberByte
-  jb exit
-  halfCheck:
+  jb error
   cmpb $28, numberByte
-  ja exit
-  numberCheckEnd:
+  ja error
 
   # Объявление первого цикла с i
   movq numberQuad, iLimit
@@ -159,7 +168,8 @@ _start:
   jmp exit
 
 error:
-  # Завершение работы программы с ошибкой ввода-вывода 
+  # Завершение работы программы с ошибкой ввода-вывода
+  call printError
   movq $sys_exit, %rax
   movq $5, %rdi
   syscall
