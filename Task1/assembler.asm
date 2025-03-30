@@ -78,6 +78,7 @@ _start:
   movb numberRegister, iLimit
   movb $iStart, i
   firstLoop:
+
     # Объявление второго цикла с j
     movb i, jLimit
     add $1, jLimit
@@ -90,11 +91,12 @@ _start:
       subb $1, %r12b
       addb $CHAR_INT_DIFFERENCE, %r12b
       addw $0xa00, %r12w
-
+      
+      test:
       # Вывод символ буквы и пробела
       movq $sys_write, %rax
       movq $STDOUT, %rdi
-      movq (%r12), %rsi
+      movq %r12, %rsi
       movq $2, %rdx
       syscall
 
