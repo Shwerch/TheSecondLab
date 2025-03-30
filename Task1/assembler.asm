@@ -12,7 +12,7 @@ _start:
   movq %rsp, %rbp # Сохранение начального состояния %rsp в %rbp
   
   movq $1, %rax       # Номер функции sys_write
-  movq $1, %rdi       # Дескриптор стандартного выходного потока
+  movq $1, %rdi       # Дескриптор стандартного выходного потока STDOUT
   movq $msg, %rsi     # Адрес начала строки
   movq $msg_len, %rdx # Длина строки
   syscall
@@ -20,8 +20,14 @@ _start:
   subq $inputSize, %rsp # Выделение $inputSize байт в стеке
   
   movq $0, %rax         # Номер функции sys_read
-  movq $1, %rdi         # Дескриптор стандартного входного потока
+  movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   movq %rsp, %rsi       # Адрес сохранения строки
+  movq $inputSize, %rdx # Длина строки
+  syscall
+  
+  movq $1, %rax       # Номер функции sys_write
+  movq $1, %rdi       # Дескриптор стандартного выходного потока STDOUT
+  movq %rsp, %rsi     # Адрес начала строки
   movq $inputSize, %rdx # Длина строки
   syscall
   
