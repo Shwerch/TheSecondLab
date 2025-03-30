@@ -2,8 +2,6 @@
 msg:
   .ascii "Enter the N number: "
   .set msg_len, . - msg
-inputSize:
-  .quad 8
 
 .text
 .globl _start
@@ -20,13 +18,14 @@ input:
   movq $0, %rax         # Номер функции sys_read
   movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   movq %rsp, %rsi       # Адрес сохранения строки
-  movq $inputSize, %rdx # Длина строки
+  movq $8, %rdx # Длина строки
   syscall
   ret
 
 # %rsp - адрес начала строки
 # %rsi - адрес конца строки
 # %rbx - основание системы счисления
+# %r8 - адрес возврата
 toNumber:
   movq $1, %rcx       # Множитель 10 в степени N
   movq $0, %rdi       # Регистр для хранения результата
@@ -41,6 +40,7 @@ toNumber:
     jb toNumberLoopEnd
     jmp toNumberLoop
   toNumberLoopEnd:
+  jmp *%rdi
   ret
 
 _start:
@@ -49,17 +49,20 @@ _start:
   # Вывод приветственного сообщения
   call output
 
-  subq $inputSize, %rsp # Выделение $inputSize байт в стеке
+  subq $8, %rsp # Выделение 8 байт в стеке
   
   # Ввод числа как массива символов
   call input
+
+  r1:
 
   # Преобразование строки в число
   movq %rsp, %rsi         # Адрес начала строки
   addq %rax, %rsi         # Прибавление кол-ва введенных символов к адресу начала строки
   subq $2, %rsi           # Теперь %rsi содержит адрес последнего символа числа
   movq $10, %rbx          # Основание системы счисления
-  call toNumber
+  movq $toNumberEnd, %r8  # Адрес возврата
+  jmp toNumber
   toNumberEnd:
   
   movq %rbp, %rsp # Восстановление %rsp (освобождение стека)
@@ -67,9 +70,8 @@ _start:
   movq $0, %rdi   # Код возврата
   syscall
 
-  
   # movq $1, %rax         # Номер функции sys_write
   # movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   # movq %rsp, %rsi       # Адрес начала строки
-  # movq $inputSize, %rdx # Длина строки
+  # movq $8, %rdx # Длина строки
   # syscall
