@@ -76,12 +76,12 @@ _start:
 
   # Объявление первого цикла с i
   movb numberRegister, iLimit
-  movb iStart, i
+  movb $iStart, i
   firstLoop:
     # Объявление второго цикла с j
     movb i, jLimit
     add $1, jLimit
-    movb jStart, j
+    movb $jStart, j
     secondLoop:
       
       # Рассчет кодов символов для вывода буквы
@@ -118,7 +118,6 @@ _start:
     je firstLoopEnd
     jmp firstLoop
   firstLoopEnd:
-
 
   jmp exit
 
