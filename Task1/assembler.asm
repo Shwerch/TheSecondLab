@@ -11,11 +11,11 @@ sys_exit=60
 
 numberRegister=%r10b
 
-iStart=1
+iStart=0
 iLimit=%r8b
 i=%r9b
 
-jStart=1
+jStart=0
 jLimit=%r10b
 j=%r11b
 
@@ -29,13 +29,13 @@ message:
 
 oneDigit:
   subb $CHAR_INT_DIFFERENCE, %r8b
-  movb %r8b, %r10b
+  movb %r8b, numberRegister
   jmp digitFunctionEnd
 
 twoDigits:
   subb $CHAR_INT_DIFFERENCE, %r8b
   subb $CHAR_INT_DIFFERENCE, %r9b
-  movb %r9b, %r10b
+  movb %r9b, numberRegister
   movb %r8b, %al
   movb $10, %r12b
   mulb %r12b
@@ -73,12 +73,36 @@ _start:
   jmp twoDigits
   digitFunctionEnd:
 
-
+  # Объявление первого цикла с i
   movb numberRegister, iLimit
   movb iStart, i
   firstLoop:
-    movb %r10b, i
-    subb $1, i
+    # Объявление второго цикла с j
+    movb i, jLimit
+    add $1, jLimit
+    movb jStart, j
+    secondLoop:
+      # ?
+      # Завершение второго цикла с j
+      addb %1, j
+      cmpb j, jLimit
+      je secondLoopEnd
+      jmp secondLoop
+    secondLoopEnd:
+
+    # Вывод символа конца строки '\n'
+    movq $sys_write, %rax
+    movq $STDOUT, %rdi
+    movq $'\n', %rsi
+    movq $1, %rdx
+    syscall
+
+    # Завершение первого цикла с i
+    addb %1, i
+    cmpb i, iLimit
+    je firstLoopEnd
+    jmp firstLoop
+  firstLoopEnd:
 
 
   jmp exit
