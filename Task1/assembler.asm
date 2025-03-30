@@ -2,6 +2,8 @@
 msg:
   .ascii "Enter the N number: "
   .set msg_len, . - msg
+inputSize:
+  .quad 8
 
 .text
 .globl _start
@@ -18,7 +20,7 @@ input:
   movq $0, %rax         # Номер функции sys_read
   movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   movq %rsp, %rsi       # Адрес сохранения строки
-  movq $8, %rdx # Длина строки
+  movq $inputSize, %rdx # Длина строки
   syscall
   ret
 
@@ -49,7 +51,7 @@ _start:
   # Вывод приветственного сообщения
   call output
 
-  subq $8, %rsp # Выделение 8 байт в стеке
+  subq $inputSize, %rsp # Выделение $inputSize байт в стеке
   
   # Ввод числа как массива символов
   call input
@@ -70,8 +72,9 @@ _start:
   movq $0, %rdi   # Код возврата
   syscall
 
+  
   # movq $1, %rax         # Номер функции sys_write
   # movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   # movq %rsp, %rsi       # Адрес начала строки
-  # movq $8, %rdx # Длина строки
+  # movq $inputSize, %rdx # Длина строки
   # syscall
