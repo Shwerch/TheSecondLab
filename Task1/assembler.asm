@@ -9,6 +9,9 @@ sys_write=1
 sys_read=0
 sys_exit=60
 
+firstDigit=%r8b
+secondDigit=%r9b
+
 numberByte=%r10b
 numberWord=%r10w
 numberQuad=%r10
@@ -41,23 +44,41 @@ LETTERS:
 .globl _start
 
 oneDigit:
-  # Конвертация символа из %r8b в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
-  movb %r8b, numberByte
+  # Конвертация символа из firstDigit в еденицы числа
+  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
+  movb firstDigit, numberByte
+
+  # Проверка символа из firstDigit на то, что он является цифрой
+  cmpb $1, firstDigit
+  jb error
+  cmpb $9, firstDigit
+  ja error
 
   jmp digitFunctionEnd
 
 twoDigits:
-  # Конвертация символа из %r9b в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, %r9b
-  movb %r9b, numberByte
+  # Конвертация символа из secondDigit в еденицы числа
+  subb $DIGIT_NUMBER_DIFFERENCE, secondDigit
+  movb secondDigit, numberByte
 
-  # Конвертация символа из %r8b в десятки числа
-  subb $DIGIT_NUMBER_DIFFERENCE, %r8b
-  movb %r8b, %al
+  # Проверка символа из secondDigit на то, что он является цифрой
+  cmpb $1, secondDigit
+  jb error
+  cmpb $9, secondDigit
+  ja error
+
+  # Конвертация символа из firstDigit в десятки числа
+  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
+  movb firstDigit, %al
   movb $10, %r12b
   mulb %r12b
   addw %ax, numberWord
+
+  # Проверка символа из firstDigit на то, что он является цифрой
+  cmpb $1, firstDigit
+  jb error
+  cmpb $9, firstDigit
+  ja error
 
   jmp digitFunctionEnd
 
@@ -114,11 +135,12 @@ _start:
   syscall
 
   # Перемещение символов в разные регистры
-  movb 0(%rsp), %r8b
-  movb 1(%rsp), %r9b
+  movb 0(%rsp), firstDigit
+  movb 1(%rsp), secondDigit
   
   # Определение, сколько цифр были введено и запись результата в numberQuad
-  cmpb $10, %r9b
+  movq $0, numberQuad
+  cmpb $10, secondDigit
   je oneDigit
   jmp twoDigits
   digitFunctionEnd:
@@ -168,10 +190,10 @@ _start:
   jmp exit
 
 error:
-  # Завершение работы программы с ошибкой ввода-вывода
+  # Завершение работы программы с ошибкой
   call printError
   movq $sys_exit, %rax
-  movq $5, %rdi
+  movq $1, %rdi
   syscall
 
 exit:
