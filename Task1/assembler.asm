@@ -25,7 +25,7 @@ input:
 print:
   movq $1, %rax       # Номер функции sys_write
   movq $1, %rdi       # Дескриптор стандартного выходного потока
-  movq (%rsp), %rsi     # Адрес начала строки
+  movq (%rsp), %rsi   # Адрес начала строки
   movq $8, %rdx # Длина строки
   syscall
   ret
