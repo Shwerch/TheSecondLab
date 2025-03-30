@@ -18,7 +18,6 @@ output:
 
 # %rsp - адрес начала строки
 # %rsi - адрес конца строки
-# %rbx - основание системы счисления
 toNumber:
   movq $1, %rcx       # Множитель 10 в степени N
   movq $0, %rdi       # Регистр для хранения результата
@@ -42,22 +41,23 @@ _start:
 
   subq $inputSize, %rsp # Выделение $inputSize байт в стеке
   
+  # Ввод числа как массива символов
   movq $0, %rax         # Номер функции sys_read
   movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
   movq %rsp, %rsi       # Адрес сохранения строки
   movq $inputSize, %rdx # Длина строки
   syscall
   
-  movq $1, %rax         # Номер функции sys_write
-  movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
-  movq %rsp, %rsi       # Адрес начала строки
-  movq $inputSize, %rdx # Длина строки
-  syscall
+  # movq $1, %rax         # Номер функции sys_write
+  # movq $1, %rdi         # Дескриптор стандартного выходного потока STDOUT
+  # movq %rsp, %rsi       # Адрес начала строки
+  # movq $inputSize, %rdx # Длина строки
+  # syscall
 
-  movq %rsp, %rsp
+  # Преобразование строки в число
   movq %rsp, %rsi
-  addq $8, %rsi
-  movq $10, %rbx
+  addq %rax, %rsi # Прибавление кол-ва введенных символов к адресу начала строки
+  subq $2, %rsi
   call toNumber
   
   movq %rbp, %rsp # Восстановление %rsp (освобождение стека)
