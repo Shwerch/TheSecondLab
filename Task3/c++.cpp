@@ -21,16 +21,23 @@ int main() {
             numbers[i].push_back(input[k]);
     }
 
+    std::vector<int> answer;
     for (int i = 0; i < numbers.size(); i++) {
         int summ = 0, multi = 1;
         for (const char j : numbers[i]) {
             const int num = (j - '0');
+            if (num < 0 || num > 9) {
+                std::cout << "You should have entered the numbers!" << std::endl;
+                return 1;
+            }
             summ += num;
             multi *= num;
         }
         if (summ < multi)
-            std::cout << i << " ";
+            answer.push_back(i);
     }
+    for (int i: answer)
+        std::cout << i << " ";
     std::cout << std::endl;
 
     return 0;
