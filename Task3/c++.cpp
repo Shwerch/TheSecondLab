@@ -3,6 +3,7 @@
 #include <string>
 
 int main() {
+    std::cout << "Enter the string of numbers with ' ' separator: ";
     std::string input;
     std::getline(std::cin, input);
 

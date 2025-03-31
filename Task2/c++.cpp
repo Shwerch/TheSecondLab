@@ -4,6 +4,7 @@
 
 int main() {
     std::string input;
+    std::cout << "Enter the string of numbers with ',' separator: ";
     std::cin >> input;
 
     std::vector separators = {-1};
