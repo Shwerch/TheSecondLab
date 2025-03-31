@@ -84,50 +84,13 @@ twoDigits:
 
   jmp digitFunctionEnd
 
-printHelloMessage:
+_start:
+  # Вывести привестственное сообщение
   movq $sys_write, %rax
   movq $STDOUT, %rdi
   movq $MESSAGE, %rsi
   movq $MESSAGE_LEN, %rdx
   syscall
-  ret
-
-printSpace:
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
-  movq $SPACE, %rsi
-  movq $1, %rdx
-  syscall
-  ret
-
-printNewLine:
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
-  movq $NEWLINE, %rsi
-  movq $1, %rdx
-  syscall
-  ret
-
-# Код символа берется из letter
-printLetter:
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
-  movq $LETTERS, %rsi
-  addq letter, %rsi
-  movq $1, %rdx
-  syscall
-  ret
-
-printError:
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
-  movq $ERROR, %rsi
-  movq $ERROR_LEN, %rdx
-  syscall
-  ret
-
-_start:
-  call printHelloMessage
   
   # Ввод числа как массива INPUT_SIZE символов в %rsp
   movq $sys_read, %rax
@@ -168,10 +131,21 @@ _start:
       movq iLimit, letter
       subq j, letter
       subq $1, letter
-      
-      call printLetter
 
-      call printSpace
+      # Вывести букву с кодом из регистра letter 
+      movq $sys_write, %rax
+      movq $STDOUT, %rdi
+      movq $LETTERS, %rsi
+      addq letter, %rsi
+      movq $1, %rdx
+      syscall
+
+      # Вывести пробел
+      movq $sys_write, %rax
+      movq $STDOUT, %rdi
+      movq $SPACE, %rsi
+      movq $1, %rdx
+      syscall
 
       # Завершение второго цикла с j
       addq $1, j
@@ -180,7 +154,12 @@ _start:
       jmp secondLoop
     secondLoopEnd:
 
-    call printNewLine
+    # Вывести символ новой строки
+    movq $sys_write, %rax
+    movq $STDOUT, %rdi
+    movq $NEWLINE, %rsi
+    movq $1, %rdx
+    syscall
 
     # Завершение первого цикла с i
     addq $1, i
@@ -192,8 +171,14 @@ _start:
   jmp exit
 
 error:
+  # Вывод сообщения об ошибке
+  movq $sys_write, %rax
+  movq $STDOUT, %rdi
+  movq $ERROR, %rsi
+  movq $ERROR_LEN, %rdx
+  syscall
+
   # Завершение работы программы с ошибкой
-  call printError
   movq $sys_exit, %rax
   movq $1, %rdi
   syscall
