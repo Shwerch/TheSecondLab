@@ -26,7 +26,7 @@ jStart=0
 jLimit=%r10
 j=%r13
 
-letter=%r14
+letterRegister=%r14
 
 .data
 MESSAGE:
@@ -128,15 +128,15 @@ _start:
     secondLoop:
       
       # Рассчет кодов символов для вывода буквы
-      movq iLimit, letter
-      subq j, letter
-      subq $1, letter
+      movq iLimit, letterRegister
+      subq j, letterRegister
+      subq $1, letterRegister
 
-      # Вывести букву с кодом из регистра letter 
+      # Вывести букву с кодом из регистра letterRegister 
       movq $sys_write, %rax
       movq $STDOUT, %rdi
       movq $LETTERS, %rsi
-      addq letter, %rsi
+      addq letterRegister, %rsi
       movq $1, %rdx
       syscall
 

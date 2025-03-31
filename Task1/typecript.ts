@@ -1,4 +1,4 @@
-const num: number = 4;
+const num: number = Number(prompt("Enter the N number: "));
     
 for (let i = 1; i <= num; i++) {
     let line = '';
