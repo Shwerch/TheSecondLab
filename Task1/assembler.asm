@@ -1,22 +1,11 @@
-INPUT_SIZE=2
-DIGIT_NUMBER_DIFFERENCE=48
-
 STDIN=0
 STDOUT=1
-STDERR=2
 
-sys_write=1
 sys_read=0
+sys_write=1
 sys_exit=60
 
-inputRegister=%rsp
-
-firstDigit=%r8b
-secondDigit=%r9b
-
-numberByte=%r10b
-numberWord=%r10w
-numberQuad=%r10
+INPUT=16
 
 iStart=0
 iLimit=%r8
@@ -45,44 +34,29 @@ LETTERS:
 .text
 .globl _start
 
-oneDigit:
-  # Конвертация символа из firstDigit в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
-  movb firstDigit, numberByte
+backup:
+  pushq %rax
+  pushq %r8
+  pushq %r9
+  pushq %r10
+  pushq %r11
+  pushq %r12
+  pushq %r13
+  pushq %r14
+  pushq %r15
+  ret
 
-  # Проверка символа из firstDigit на то, что он является цифрой
-  cmpb $1, firstDigit
-  jb error
-  cmpb $9, firstDigit
-  ja error
-
-  jmp digitFunctionEnd
-
-twoDigits:
-  # Конвертация символа из secondDigit в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, secondDigit
-  movb secondDigit, numberByte
-
-  # Проверка символа из secondDigit на то, что он является цифрой
-  cmpb $1, secondDigit
-  jb error
-  cmpb $9, secondDigit
-  ja error
-
-  # Конвертация символа из firstDigit в десятки числа
-  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
-  movb firstDigit, %al
-  movb $10, %r12b
-  mulb %r12b
-  addw %ax, numberWord
-
-  # Проверка символа из firstDigit на то, что он является цифрой
-  cmpb $1, firstDigit
-  jb error
-  cmpb $9, firstDigit
-  ja error
-
-  jmp digitFunctionEnd
+clear:
+  movq $0, %rax
+  movq $0, %r8
+  movq $0, %r9
+  movq $0, %r10
+  movq $0, %r11
+  movq $0, %r12
+  movq $0, %r13
+  movq $0, %r15
+  movq $0, %r14
+  ret
 
 _start:
   # Вывести привестственное сообщение
@@ -91,30 +65,82 @@ _start:
   movq $MESSAGE, %rsi
   movq $MESSAGE_LEN, %rdx
   syscall
+
+  # Выделить место в стеке в размере INPUT байт
+  subl $INPUT, %esp
   
-  # Ввод числа как массива INPUT_SIZE символов в %rsp
+  # Ввод числа как массива INPUT символов в стек
   movq $sys_read, %rax
   movq $STDIN, %rdi
-  movq inputRegister, %rsi
-  movq $2048, %rdx
+  movq %rsp, %rsi
+  addq $INPUT, %rsi
   syscall
 
-  # Перемещение символов в разные регистры
-  movb 0(inputRegister), firstDigit
-  movb 1(inputRegister), secondDigit
+  # Бэкапирование и обнуление значений регистров %rax %r8 %r9 %r10 %r11 %r12 %r13 %r14 %r15
+  call backup
+  call clear
+
+  # Определение адреса начала строки
+  movq %rsp, %r10
+  addq $INPUT, %r10
+  addq $32, %r10
+
+  # Перемещение символов в регистры %r8 и %r9
+  movb 0(%r10), %r8b
+  movb 1(%r10), %r9b
+  subq $'0', %r8
+  subq $'0', %r9
+
+  # Проверка символа из %r8 на то, что он является цифрой
+  cmpq $1, %r8
+  jb error
+  cmpq $9, %r8
+  ja error
   
-  # Определение, сколько цифр были введено и запись результата в numberQuad
-  movq $0, numberQuad
-  cmpb $10, secondDigit
+  # Определение, сколько цифр было введено и запись результата в %r11
+  cmpq $10, %r9
   je oneDigit
   jmp twoDigits
+
+  oneDigit:
+  # Конвертация символа из %r8 в еденицы числа в %r11
+  addq %r8, %r11
+
+  jmp digitFunctionEnd
+
+  twoDigits:
+  # Проверка символа из %r9 на то, что он является цифрой
+  cmpq $1, %r9
+  jb error
+  cmpq $9, %r9
+  ja error
+
+  # Конвертация символа из %r8 в десятки числа в %r11
+  movq %r8, %rax
+  movq $10, %r12
+  mulq %r12
+  addq %rax, %r11
+
+  # Конвертация символа из %r9 в еденицы числа в %r11
+  addq %r9, %r10
+
+  jmp digitFunctionEnd
+
   digitFunctionEnd:
 
   # Проверка числа на корректность
-  cmpb $1, numberByte
+  cmpq $1, %r11
   jb error
-  cmpb $26, numberByte
+  cmpq $26, %r11
   ja error
+
+  # Бэкапирование и обнуление значений регистров %rax %r8 %r9 %r10 %r11 %r12
+  pushq %rax
+  pushq %r8
+  pushq %r9
+  pushq %r10
+  pushq %r11
+  pushq %r12
 
   # Объявление первого цикла с i
   movq numberQuad, iLimit
