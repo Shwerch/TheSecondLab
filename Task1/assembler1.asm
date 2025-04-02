@@ -108,11 +108,6 @@ _start:
   mulq %rdx
   movq %rax, %r9
 
-  movq %rsp, %r15
-  subq %r9, %rsp
-
-  r1:
-
   movq %r8, %r10
   movq $0, %r11
   firstLoop:
@@ -127,8 +122,9 @@ _start:
       subq $1, %r14
       addq $'A', %r14
 
+      movq $0, %rax
       movw %r14w, %ax
-      movw $8, %cx
+      movw $0x100, %cx
       mulw %cx
       addw $' ', %ax
       pushw %ax
@@ -149,15 +145,15 @@ _start:
     jmp firstLoop
   firstLoopEnd:
 
-  r2:
-
   movq $1, %rax
   movq $1, %rdi
-  movq %r15, %rsi
+  movq %rsp, %rsi
   movq %r9, %rdx
   syscall
   
   movq %r15, %rsp
+  movq 0(%r15), %rax
+  r1:
 
   popq %r15
   popq %r14
@@ -177,7 +173,7 @@ error:
   movq $ERROR_LEN, %rdx
   syscall
 
-  movq $0, %rax
+  movq $60, %rax
   movq $1, %rdi
   syscall
 
