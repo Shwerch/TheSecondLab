@@ -35,6 +35,7 @@ _start:
 
   pushq %rax
   pushq %rdx
+  pushq %rcx
   pushq %r8
   pushq %r9
   pushq %r10
@@ -49,7 +50,7 @@ _start:
 
   movq %rsp, %r10
   addq $INPUT, %r10
-  addq $80, %r10  # Так как было сохранено 10 регистров 8 байт
+  addq $88, %r10  # Так как было сохранено 11 регистров по 8 байт
   
   movb 0(%r10), %r8b
   movb 1(%r10), %r9b
@@ -114,21 +115,24 @@ _start:
   subq %r9, %rsp
 
   movq %r8, %r10
-  movq 0, %r11
+  movq $0, %r11
   firstLoop:
 
     movq %r11, %r12
     addq $1, %r12
-    movq 0, %r13
+    movq $0, %r13
     secondLoop:
 
       movq %r8, %r14
       subq %r13, %r14
       subq $1, %r14
+      addq $'A', %r14
 
-      movb %r14b, 0(%r15)
-      movb $' ', 1(%r15)
-      addq $2, %r15
+      movw %r14w, %ax
+      movw $8, %cx
+      mulw %cx
+      addw $' ', %ax
+      pushw %ax
 
       addq $1, %r13
       cmpq %r12, %r13
@@ -136,8 +140,9 @@ _start:
       jmp secondLoop
     secondLoopEnd:
 
-    movb $'\n', 0(%r15)
-    addq $1, %r15
+    popw %ax
+    movb $'\n', %al
+    pushw %ax
 
     addq $1, %r11
     cmpq %r10, %r11
@@ -145,7 +150,6 @@ _start:
     jmp firstLoop
   firstLoopEnd:
 
-  r1:
   popq %r15
   popq %r14
   popq %r13
@@ -154,6 +158,7 @@ _start:
   popq %r10
   popq %r9
   popq %r8
+  popq %rcx
   popq %rdx
   popq %rax
 
