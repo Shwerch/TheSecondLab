@@ -33,6 +33,8 @@ _start:
   movq $INPUT, %rdx
   syscall
 
+  pushq %rax
+  pushq %rdx
   pushq %r8
   pushq %r9
   pushq %r10
@@ -42,7 +44,7 @@ _start:
 
   movq %rsp, %r10
   addq $INPUT, %r10
-  addq $24, %r10
+  addq $40, %r10  # Так как было сохранено 5 регистров 8 байт
   
   movb 0(%r10), %r8b
   movb 1(%r10), %r9b
@@ -80,23 +82,33 @@ _start:
 
     movb %r9b, %r10b
 
-    pushw %ax
-
-    movb %r8b, %al
-    movb $10, %ah
-    mulb %ah
-    addw %ax, %r10w
-
-    popw %ax
+    movq %r8, %rax
+    movq $10, %rdx
+    mulq %rdx
+    addq %rax, %r10
   jmp digitFunctionEnd
 
   digitFunctionEnd:
 
-  r2:
+  movq %r10, %r8
+  movq $0, %r9
+  movq $0, %r10
+
+  movq %r8, %rax
+  addq $1, %rax
+  movq %r8, %rdx
+  mulq %rdx
+  movq %rax, %r9
+
+  # subq %r9, %rsp
+
+  r1:
 
   popq %r10
   popq %r9
   popq %r8
+  popq %rdx
+  popq %rax
 
   jmp exit
 
