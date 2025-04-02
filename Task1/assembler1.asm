@@ -33,9 +33,6 @@ _start:
   movq $INPUT, %rdx
   syscall
 
-  pushq %rax
-  pushq %rdx
-  pushq %rcx
   pushq %r8
   pushq %r9
   pushq %r10
@@ -50,7 +47,7 @@ _start:
 
   movq %rsp, %r10
   addq $INPUT, %r10
-  addq $88, %r10  # Так как было сохранено 11 регистров по 8 байт
+  addq $64, %r10  # Так как было сохранено 8 регистров по 8 байт
   
   movb 0(%r10), %r8b
   movb 1(%r10), %r9b
@@ -106,13 +103,15 @@ _start:
   ja error
 
   movq %r8, %rax
-  addq $2, %rax
+  addq $1, %rax
   movq %r8, %rdx
   mulq %rdx
   movq %rax, %r9
 
   movq %rsp, %r15
   subq %r9, %rsp
+
+  r1:
 
   movq %r8, %r10
   movq $0, %r11
@@ -150,6 +149,16 @@ _start:
     jmp firstLoop
   firstLoopEnd:
 
+  r2:
+
+  movq $1, %rax
+  movq $1, %rdi
+  movq %r15, %rsi
+  movq %r9, %rdx
+  syscall
+  
+  movq %r15, %rsp
+
   popq %r15
   popq %r14
   popq %r13
@@ -158,9 +167,6 @@ _start:
   popq %r10
   popq %r9
   popq %r8
-  popq %rcx
-  popq %rdx
-  popq %rax
 
   jmp exit
 
