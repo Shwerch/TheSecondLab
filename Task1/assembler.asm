@@ -51,8 +51,10 @@ _start:
 
   # Рассчет числа при одной введенной цифре
   oneDigit:
+    # Перевод значения из кода символа в цифру
     subq $'0', %r8
 
+    # Проверка значения на то, что оно является цифрой
     cmpq $1, %r8
     jb error
     cmpq $9, %r8
@@ -61,24 +63,25 @@ _start:
 
   # Рассчет числа при двух введенных цифрах
   twoDigits:
+    # Перевод значения из кода символа в цифру
     subq $'0', %r9
     subq $'0', %r8
 
+    # Проверка значения на то, что оно является цифрой
     cmpq $1, %r9
     jb error
     cmpq $9, %r9
     ja error
-
     cmpq $1, %r8
     jb error
     cmpq $9, %r8
     ja error
 
+    # Пересчет значения цифры в десятки числа
     movq %r8, %rax
     movq $10, %rdx
     mulq %rdx
     movq %rax, %r8
-
     addq %r9, %r8
   jmp digitFunctionEnd
 
@@ -90,7 +93,8 @@ _start:
   cmpq $26, %r8
   ja error
 
-  # Рассчет длины выводимой строки
+  # Рассчет длины выводимой строки по формуле арифметической прогрессии
+  # Sn = n * (a1 + an) / 2 = n * (2 + 2 * n) / 2 =  n * (n + 1)
   movq %r8, %rax
   addq $1, %rax
   movq %r8, %rdx
@@ -99,10 +103,11 @@ _start:
 
   # Рассчет адреса начала выводимой строки
   movq %rsp, %r15
-  addq $1, %r15
+  subq $1, %r15
 
-  popw %ax
-  movb $'\n', %al
+  # Добавление символа новой строки в конец строки,
+  # Так как строка выводится задом наперед
+  movw $'\n', %ax
   pushw %ax
 
   # Добавление символов в строку в стеке
@@ -115,10 +120,12 @@ _start:
     movq $0, %r13
     secondLoop:
 
+      # Рассчет кода выводимой буквы
       movq $'A', %r14
       addq %r13, %r14
       addq %r11, %r14
 
+      # Добавление пробела после буквы
       movq $0, %rax
       movw %r14w, %ax
       movw $0x100, %cx
@@ -132,6 +139,7 @@ _start:
       jmp secondLoop
     secondLoopEnd:
 
+    # Замена пробела на символ новой строки в конце строки
     popw %ax
     movb $'\n', %al
     pushw %ax
@@ -152,11 +160,10 @@ _start:
   movq %r9, %rdx
   syscall
 
-  popq %r15
-  subq $1, %r15
-  addq $INPUT, %r15
-
   # Очистка стека от данных
+  popq %r15
+  addq $1, %r15
+  addq $INPUT, %r15
   movq %r15, %rsp
 
   jmp exit
