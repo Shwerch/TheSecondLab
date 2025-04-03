@@ -1,6 +1,6 @@
 fun main() {
-    println("Enter the string of numbers with ',' separator: ")
-    val input = readLine() ?: ""
+    print("Enter the string of numbers with ',' separator: ")
+    val input = readLine()!!
 
     val separators = mutableListOf(-1)
     for (i in input.indices) {
@@ -14,7 +14,7 @@ fun main() {
     for (i in 0 until separators.size - 1) {
         count += (separators[i + 1] - separators[i] - 1) % 2
         for (j in (separators[i] + 1)..(separators[i + 1] - 1)) {
-            if (input[j] !in '0'..'9') {
+            if (input[j] < '0' || input[j] > '9') {
                 println("You should have entered the numbers!")
                 return
             }

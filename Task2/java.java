@@ -1,18 +1,20 @@
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.print("Enter the string of numbers with ',' separator: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the string of numbers with ',' separator: ");
         String input = scanner.nextLine();
-        scanner.close();
 
-        ArrayList<Integer> separators = new ArrayList<Integer>();
+        List<Integer> separators = new ArrayList<>();
         separators.add(-1);
-        for (int i = 0; i < input.length(); i++)
-            if (input.charAt(i) == ',')
-               separators.add(i);
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == ',') {
+                separators.add(i);
+            }
+        }
         separators.add(input.length());
 
         int count = 0;

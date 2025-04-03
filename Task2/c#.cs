@@ -12,9 +12,7 @@ class Program
         for (int i = 0; i < input.Length; i++)
         {
             if (input[i] == ',')
-            {
                 separators.Add(i);
-            }
         }
         separators.Add(input.Length);
 
@@ -31,7 +29,6 @@ class Program
                 }
             }
         }
-        
         Console.WriteLine(count);
     }
 }

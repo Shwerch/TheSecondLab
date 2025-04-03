@@ -2,11 +2,12 @@ package main
 
 import (
  "fmt"
+ "strings"
 )
 
 func main() {
- fmt.Print("Enter the string of numbers with ',' separator: ")
  var input string
+ fmt.Print("Enter the string of numbers with ',' separator: ")
  fmt.Scanln(&input)
 
  separators := []int{-1}
