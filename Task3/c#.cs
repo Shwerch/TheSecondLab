@@ -5,7 +5,7 @@ class Program
 {
     static void Main()
     {
-        Console.WriteLine("Enter the string of numbers with ' ' separator: ");
+        Console.Write("Enter the string of numbers with ' ' separator: ");
         string input = Console.ReadLine();
 
         List<int> separators = new List<int> { -1 };
@@ -19,11 +19,9 @@ class Program
         List<List<char>> numbers = new List<List<char>>();
         for (int i = 0; i < separators.Count - 1; i++)
         {
-            int j = i + 1;
-            List<char> number = new List<char>();
-            for (int k = separators[i] + 1; k < separators[j]; k++)
-                number.Add(input[k]);
-            numbers.Add(number);
+            numbers.Add(new List<char>());
+            for (int k = separators[i] + 1; k < separators[i + 1]; k++)
+                numbers[i].Add(input[k]);
         }
 
         List<int> answer = new List<int>();
@@ -47,6 +45,8 @@ class Program
 
         foreach (int i in answer)
             Console.Write(i + " ");
-        Console.WriteLine();
+        
+        if (answer.Count > 0)
+            Console.WriteLine();
     }
 }

@@ -38,7 +38,8 @@ int main() {
     }
     for (int i: answer)
         std::cout << i << " ";
-    std::cout << std::endl;
+    if (answer.size())
+        std::cout << std::endl;
 
     return 0;
 }

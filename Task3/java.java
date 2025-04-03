@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -7,7 +8,7 @@ public class Main {
         System.out.print("Enter the string of numbers with ' ' separator: ");
         String input = scanner.nextLine();
 
-        ArrayList<Integer> separators = new ArrayList<>();
+        List<Integer> separators = new ArrayList<>();
         separators.add(-1);
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == ' ') {
@@ -16,17 +17,15 @@ public class Main {
         }
         separators.add(input.length());
 
-        ArrayList<ArrayList<Character>> numbers = new ArrayList<>();
+        List<List<Character>> numbers = new ArrayList<>();
         for (int i = 0; i < separators.size() - 1; i++) {
-            int j = i + 1;
-            ArrayList<Character> number = new ArrayList<>();
-            for (int k = separators.get(i) + 1; k < separators.get(j); k++) {
-                number.add(input.charAt(k));
+            numbers.add(new ArrayList<>());
+            for (int k = separators.get(i) + 1; k < separators.get(i + 1); k++) {
+                numbers.get(i).add(input.charAt(k));
             }
-            numbers.add(number);
         }
 
-        ArrayList<Integer> answer = new ArrayList<>();
+        List<Integer> answer = new ArrayList<>();
         for (int i = 0; i < numbers.size(); i++) {
             int summ = 0, multi = 1;
             for (char j : numbers.get(i)) {
@@ -43,11 +42,11 @@ public class Main {
             }
         }
 
-        for (int i : answer) {
-            System.out.print(i + " ");
+        for (int i : answer) {            System.out.print(i + " ");
         }
-        System.out.println();
-        
-        scanner.close();
+        if (answer.size() > 0) {
+            System.out.println();
+        }
     }
 }
+

@@ -7,8 +7,9 @@ import (
 )
 
 func main() {
- fmt.Print("Enter the string of numbers with ' ' separator: ")
+ fmt.Print("Enter the string of numbers with ' ' separator:\n")
  input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+ input = input[:len(input)-1]
 
  separators := []int{-1}
  for i, char := range input {
@@ -47,5 +48,7 @@ func main() {
  for _, i := range answer {
   fmt.Print(i, " ")
  }
- fmt.Println()
+ if len(answer) > 0 {
+  fmt.Println()
+ }
 }

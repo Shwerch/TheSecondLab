@@ -1,6 +1,6 @@
 fun main() {
-    println("Enter the string of numbers with ' ' separator: ")
-    val input = readLine() ?: ""
+    print("Enter the string of numbers with ' ' separator: ")
+    val input = readLine()!!
 
     val separators = mutableListOf(-1)
     for (i in input.indices) {
@@ -12,11 +12,10 @@ fun main() {
 
     val numbers = mutableListOf<MutableList<Char>>()
     for (i in 0 until separators.size - 1) {
-        val numberList = mutableListOf<Char>()
-        for (k in (separators[i] + 1) until separators[i + 1]) {
-            numberList.add(input[k])
+        numbers.add(mutableListOf())
+        for (k in (separators[i] + 1)..(separators[i + 1] - 1)) {
+            numbers[i].add(input[k])
         }
-        numbers.add(numberList)
     }
 
     val answer = mutableListOf<Int>()
@@ -37,8 +36,6 @@ fun main() {
         }
     }
 
-    for (i in answer) {
-        print("$i ")
-    }
-    println()
+    println(answer.joinToString(" "))
+    if (answer.isNotEmpty()) println()
 }
