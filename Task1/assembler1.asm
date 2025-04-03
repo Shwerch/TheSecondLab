@@ -42,8 +42,6 @@ _start:
   pushq %r14
   pushq %r15
 
-  r1:
-
   movq $0, %r8
   movq $0, %r9
 
@@ -111,8 +109,6 @@ _start:
   movq %rax, %r9
 
   movq %rsp, %r15
-
-  r2:
 
   movq %r8, %r10
   movq $0, %r11
@@ -194,8 +190,6 @@ _start:
   popq %r8
 
   addq $INPUT, %rsp
-
-  r3:
 
   jmp exit
 
