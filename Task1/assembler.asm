@@ -94,33 +94,31 @@ _start:
   cmpq $26, %r8
   ja error
 
-  # В %r8 хранится введеное число
-
   movq %r8, %rax
   addq $1, %rax
   movq %r8, %rdx
   mulq %rdx
   movq %rax, %r9
 
-  # В %r9 хранится длина выводимой строки
-
   movq %rsp, %r15
+  addq $1, %r15
 
-  # В %r15 хранится адрес начала выводимой строки
+  popw %ax
+  movb $'\n', %al
+  pushw %ax
 
   movq %r8, %r10
   movq $0, %r11
   firstLoop:
 
-    movq %r11, %r12
-    addq $1, %r12
+    movq %r8, %r12
+    subq %r11, %r12
     movq $0, %r13
     secondLoop:
 
-      movq %r8, %r14
-      subq %r13, %r14
-      subq $1, %r14
-      addq $'A', %r14
+      movq $'A', %r14
+      addq %r13, %r14
+      addq %r11, %r14
 
       movq $0, %rax
       movw %r14w, %ax
@@ -147,34 +145,10 @@ _start:
 
   movq $1, %rax
   movq $1, %rdi
-  movq $1, %rdx
   movq %r15, %rsi
-
-  movq %r9, %r10
-  movq $0, %r11
-  printLoop:
-    pushq %r10
-    pushq %r11
-    pushq %r15
-
-    syscall
-
-    popq %r15
-    popq %r11
-    popq %r10
-
-    subq $1, %rsi
-
-    addq $1, %r11
-    cmpq %r10, %r11
-    je printLoopEnd
-    jmp printLoop
-  printLoopEnd:
-  
-  pushw $'\n'
-  movq %rsp, %rsi
+  subq %r9, %rsi
+  movq %r9, %rdx
   syscall
-  popw %ax
   
   movq %r15, %rsp
 
@@ -188,8 +162,6 @@ _start:
   popq %r8
 
   addq $INPUT, %rsp
-
-  r2:
 
   jmp exit
 
