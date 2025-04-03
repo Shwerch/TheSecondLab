@@ -30,30 +30,19 @@ _start:
   movq %rsp, %rax
   addq $INPUT, %rax
 
-  pushq %r8
-  pushq %r9
-  pushq %r10
-  pushq %r11
-  pushq %r12
-  pushq %r13
-  pushq %r14
-  pushq %r15
-
   movq $0, %r8
   movq $0, %r9
   movq $0, %r10
-  movq $0, %r11
-  movq $0, %r12
-  movq $0, %r13
-  movq $0, %r14
-  movq $0, %r15
 
   movb 0(%rax), %r8b
   movb 1(%rax), %r9b
+  movb 2(%rax), %r10b
 
   cmpq $10, %r9
   je oneDigit
-  jmp twoDigits
+  cmpq $10, %r10
+  je twoDigits
+  jmp error
 
   oneDigit:
     subq $'0', %r8
@@ -143,25 +132,20 @@ _start:
     jmp firstLoop
   firstLoopEnd:
 
+  pushq %r15
+
   movq $1, %rax
   movq $1, %rdi
   movq %r15, %rsi
   subq %r9, %rsi
   movq %r9, %rdx
   syscall
-  
-  movq %r15, %rsp
 
   popq %r15
-  popq %r14
-  popq %r13
-  popq %r12
-  popq %r11
-  popq %r10
-  popq %r9
-  popq %r8
+  subq $1, %r15
+  addq $INPUT, %r15
 
-  addq $INPUT, %rsp
+  movq %r15, %rsp
 
   jmp exit
 
