@@ -1,32 +1,4 @@
-INPUT_SIZE=2
-DIGIT_NUMBER_DIFFERENCE=48
-
-STDIN=0
-STDOUT=1
-STDERR=2
-
-sys_write=1
-sys_read=0
-sys_exit=60
-
-inputRegister=%rsp
-
-firstDigit=%r8b
-secondDigit=%r9b
-
-numberByte=%r10b
-numberWord=%r10w
-numberQuad=%r10
-
-iStart=0
-iLimit=%r8
-i=%r9
-
-jStart=0
-jLimit=%r10
-j=%r13
-
-letterRegister=%r14
+INPUT=16
 
 .data
 MESSAGE:
@@ -45,146 +17,195 @@ LETTERS:
 .text
 .globl _start
 
-oneDigit:
-  # Конвертация символа из firstDigit в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
-  movb firstDigit, numberByte
-
-  # Проверка символа из firstDigit на то, что он является цифрой
-  cmpb $1, firstDigit
-  jb error
-  cmpb $9, firstDigit
-  ja error
-
-  jmp digitFunctionEnd
-
-twoDigits:
-  # Конвертация символа из secondDigit в еденицы числа
-  subb $DIGIT_NUMBER_DIFFERENCE, secondDigit
-  movb secondDigit, numberByte
-
-  # Проверка символа из secondDigit на то, что он является цифрой
-  cmpb $1, secondDigit
-  jb error
-  cmpb $9, secondDigit
-  ja error
-
-  # Конвертация символа из firstDigit в десятки числа
-  subb $DIGIT_NUMBER_DIFFERENCE, firstDigit
-  movb firstDigit, %al
-  movb $10, %r12b
-  mulb %r12b
-  addw %ax, numberWord
-
-  # Проверка символа из firstDigit на то, что он является цифрой
-  cmpb $1, firstDigit
-  jb error
-  cmpb $9, firstDigit
-  ja error
-
-  jmp digitFunctionEnd
-
 _start:
-  # Вывести привестственное сообщение
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
+  movq $1, %rax
+  movq $1, %rdi
   movq $MESSAGE, %rsi
   movq $MESSAGE_LEN, %rdx
   syscall
-  
-  # Ввод числа как массива INPUT_SIZE символов в %rsp
-  movq $sys_read, %rax
-  movq $STDIN, %rdi
-  movq inputRegister, %rsi
-  movq $2048, %rdx
+
+  subq $INPUT, %rsp
+
+  movq $0, %rax
+  movq $0, %rdi
+  movq %rsp, %rsi
+  addq $INPUT, %rsi
+  movq $INPUT, %rdx
   syscall
 
-  # Перемещение символов в разные регистры
-  movb 0(inputRegister), firstDigit
-  movb 1(inputRegister), secondDigit
+  pushq %r8
+  pushq %r9
+  pushq %r10
+  pushq %r11
+  pushq %r12
+  pushq %r13
+  pushq %r14
+  pushq %r15
+
+  movq %rsp, %r10
+  # Так как было сохранено 8 регистров по 8 байт
+  addq $64, %r10
+  addq $INPUT, %r10
+
+  movq $0, %r8
+  movq $0, %r9
   
-  # Определение, сколько цифр были введено и запись результата в numberQuad
-  movq $0, numberQuad
-  cmpb $10, secondDigit
+  movb 0(%r10), %r8b
+  movb 1(%r10), %r9b
+  
+  movq $0, %r10
+
+  cmpb $10, %r9b
   je oneDigit
   jmp twoDigits
+
+  oneDigit:
+    subb $'0', %r8b
+
+    cmpb $1, %r8b
+    jb error
+    cmpb $9, %r8b
+    ja error
+
+    movb %r8b, %r10b
+  jmp digitFunctionEnd
+
+  twoDigits:
+    subb $'0', %r9b
+    subb $'0', %r8b
+
+    cmpb $1, %r9b
+    jb error
+    cmpb $9, %r9b
+    ja error
+
+    cmpb $1, %r8b
+    jb error
+    cmpb $9, %r8b
+    ja error
+
+    movb %r9b, %r10b
+
+    movq %r8, %rax
+    movq $10, %rdx
+    mulq %rdx
+    addq %rax, %r10
+  jmp digitFunctionEnd
+
   digitFunctionEnd:
 
-  # Проверка числа на корректность
-  cmpb $1, numberByte
+  movq %r10, %r8
+  movq $0, %r9
+  movq $0, %r10
+
+  cmpq $1, %r8
   jb error
-  cmpb $26, numberByte
+  cmpq $26, %r8
   ja error
 
-  # Объявление первого цикла с i
-  movq numberQuad, iLimit
-  movq $iStart, i
+  movq %r8, %rax
+  addq $1, %rax
+  movq %r8, %rdx
+  mulq %rdx
+  movq %rax, %r9
+
+  movq %rsp, %r15
+
+  movq %r8, %r10
+  movq $0, %r11
   firstLoop:
 
-    # Объявление второго цикла с j
-    movq i, jLimit
-    addq $1, jLimit
-    movq $jStart, j
+    movq %r11, %r12
+    addq $1, %r12
+    movq $0, %r13
     secondLoop:
-      
-      # Рассчет кодов символов для вывода буквы
-      movq iLimit, letterRegister
-      subq j, letterRegister
-      subq $1, letterRegister
 
-      # Вывести букву с кодом из регистра letterRegister 
-      movq $sys_write, %rax
-      movq $STDOUT, %rdi
-      movq $LETTERS, %rsi
-      addq letterRegister, %rsi
-      movq $1, %rdx
-      syscall
+      movq %r8, %r14
+      subq %r13, %r14
+      subq $1, %r14
+      addq $'A', %r14
 
-      # Вывести пробел
-      movq $sys_write, %rax
-      movq $STDOUT, %rdi
-      movq $SPACE, %rsi
-      movq $1, %rdx
-      syscall
+      movq $0, %rax
+      movw %r14w, %ax
+      movw $0x100, %cx
+      mulw %cx
+      addw $' ', %ax
+      pushw %ax
 
-      # Завершение второго цикла с j
-      addq $1, j
-      cmpq j, jLimit
+      addq $1, %r13
+      cmpq %r12, %r13
       je secondLoopEnd
       jmp secondLoop
     secondLoopEnd:
 
-    # Вывести символ новой строки
-    movq $sys_write, %rax
-    movq $STDOUT, %rdi
-    movq $NEWLINE, %rsi
-    movq $1, %rdx
-    syscall
+    popw %ax
+    movb $'\n', %al
+    pushw %ax
 
-    # Завершение первого цикла с i
-    addq $1, i
-    cmpq i, iLimit
+    addq $1, %r11
+    cmpq %r10, %r11
     je firstLoopEnd
     jmp firstLoop
   firstLoopEnd:
 
+  movq $1, %rax
+  movq $1, %rdi
+  movq $1, %rdx
+  movq %r15, %rsi
+
+  movq %r9, %r10
+  movq $0, %r11
+  printLoop:
+    pushq %r10
+    pushq %r11
+    pushq %r15
+
+    syscall
+
+    popq %r15
+    popq %r11
+    popq %r10
+
+    subq $1, %rsi
+
+    addq $1, %r11
+    cmpq %r10, %r11
+    je printLoopEnd
+    jmp printLoop
+  printLoopEnd:
+  
+  pushw $'\n'
+  movq %rsp, %rsi
+  syscall
+  popw %ax
+  
+  movq %r15, %rsp
+
+  popq %r15
+  popq %r14
+  popq %r13
+  popq %r12
+  popq %r11
+  popq %r10
+  popq %r9
+  popq %r8
+
+  addq $INPUT, %rsp
+
   jmp exit
 
 error:
-  # Вывод сообщения об ошибке
-  movq $sys_write, %rax
-  movq $STDOUT, %rdi
+  movq $1, %rax
+  movq $1, %rdi
   movq $ERROR, %rsi
   movq $ERROR_LEN, %rdx
   syscall
 
-  # Завершение работы программы с ошибкой
-  movq $sys_exit, %rax
+  movq $60, %rax
   movq $1, %rdi
   syscall
 
 exit:
-  # Завершение работы программы
-  movq $sys_exit, %rax
+  movq $60, %rax
   movq $0, %rdi
   syscall
