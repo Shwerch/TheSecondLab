@@ -2,17 +2,11 @@ INPUT=16
 
 .data
 MESSAGE:
-  .ascii "Enter the N number: "
+  .ascii "Enter the N number from 1 to 26: "
   .set MESSAGE_LEN, . - MESSAGE
 ERROR:
   .ascii "The N number must be from 1 to 26!\n"
   .set ERROR_LEN, . - ERROR
-SPACE:
-  .ascii " "
-NEWLINE:
-  .ascii "\n"
-LETTERS:
-  .ascii "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 .text
 .globl _start

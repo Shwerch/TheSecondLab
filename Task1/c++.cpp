@@ -2,7 +2,7 @@
 
 int main() {
     int num = 0;
-    std::cout << "Enter the N number: ";
+    std::cout << "Enter the N number from 1 to 26: ";
     std::cin >> num;
     if (num < 1 || num > 26) {
         std::cout << "The N number must be from 1 to 26!" << std::endl;
