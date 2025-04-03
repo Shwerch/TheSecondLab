@@ -42,6 +42,8 @@ _start:
   pushq %r14
   pushq %r15
 
+  r1:
+
   movq $0, %r8
   movq $0, %r9
 
@@ -108,6 +110,10 @@ _start:
   mulq %rdx
   movq %rax, %r9
 
+  movq %rsp, %r15
+
+  r2:
+
   movq %r8, %r10
   movq $0, %r11
   firstLoop:
@@ -147,13 +153,36 @@ _start:
 
   movq $1, %rax
   movq $1, %rdi
+  movq $1, %rdx
+  movq %r15, %rsi
+
+  movq %r9, %r10
+  movq $0, %r11
+  printLoop:
+    pushq %r10
+    pushq %r11
+    pushq %r15
+
+    syscall
+
+    popq %r15
+    popq %r11
+    popq %r10
+
+    subq $1, %rsi
+
+    addq $1, %r11
+    cmpq %r10, %r11
+    je printLoopEnd
+    jmp printLoop
+  printLoopEnd:
+  
+  pushw $'\n'
   movq %rsp, %rsi
-  movq %r9, %rdx
   syscall
+  popw %ax
   
   movq %r15, %rsp
-  movq 0(%r15), %rax
-  r1:
 
   popq %r15
   popq %r14
@@ -163,6 +192,10 @@ _start:
   popq %r10
   popq %r9
   popq %r8
+
+  addq $INPUT, %rsp
+
+  r3:
 
   jmp exit
 
