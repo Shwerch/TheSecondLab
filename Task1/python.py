@@ -1,8 +1,9 @@
-
 num = int(input("Enter the N number: "))
 
-for i in range(1, num + 1):
-    line = ''
-    for j in range(1, i + 1):
-        line += chr(num - j + ord('A')) + " "
-    print(line.strip())
+if num < 1 or num > 26:
+    print("The N number must be from 1 to 26!")
+else:
+    for i in range(num):
+        for j in range(i + 1):
+            print(chr(num - j - 1 + ord('A')), end=' ')
+        print()

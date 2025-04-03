@@ -1,22 +1,23 @@
 package main
 
 import (
-	"fmt"
+ "fmt"
 )
 
 func main() {
-	var num int
-	fmt.Printf("Enter the N number: ")
-	_, err := fmt.Scan(&num)
-	if err != nil {
-		return
-	}
+ var num int
+ fmt.Print("Enter the N number: ")
+ fmt.Scan(&num)
 
-	for i := 1; i <= num; i++ {
-		for j := 1; j <= i; j++ {
-			ch := rune(num - j + int('A'))
-			fmt.Printf("%c ", ch)
-		}
-		fmt.Println()
-	}
+ if num < 1 || num > 26 {
+  fmt.Println("The N number must be from 1 to 26!")
+  return
+ }
+
+ for i := 0; i < num; i++ {
+  for j := 0; j <= i; j++ {
+   fmt.Printf("%c ", 'A'+rune(num-j-1))
+  }
+  fmt.Println()
+ }
 }

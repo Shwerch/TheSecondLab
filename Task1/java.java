@@ -2,15 +2,19 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.print("Enter the N number: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the N number: ");
         int num = scanner.nextInt();
-        scanner.close();
-        
-        for (int i = 1; i <= num; i++) {
-            for (int j = 1; j <= i; j++)
-                System.out.print((char)(num - j + (int)'A') + " ");
-            System.out.print('\n');
+
+        if (num < 1 || num > 26) {
+            System.out.println("The N number must be from 1 to 26!");
+            return;
+        }
+
+        for (int i = 0; i < num; i++) {
+            for (int j = 0; j <= i; j++)
+                System.out.print((char)(num - j - 1 + 'A') + " ");
+            System.out.println();
         }
     }
 }
