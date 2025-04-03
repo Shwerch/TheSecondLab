@@ -27,6 +27,9 @@ _start:
   movq $INPUT, %rdx
   syscall
 
+  movq %rsp, %rax
+  addq $INPUT, %rax
+
   pushq %r8
   pushq %r9
   pushq %r10
@@ -36,66 +39,62 @@ _start:
   pushq %r14
   pushq %r15
 
-  movq %rsp, %r10
-  # Так как было сохранено 8 регистров по 8 байт
-  addq $64, %r10
-  addq $INPUT, %r10
-
   movq $0, %r8
   movq $0, %r9
-  
-  movb 0(%r10), %r8b
-  movb 1(%r10), %r9b
-  
   movq $0, %r10
+  movq $0, %r11
+  movq $0, %r12
+  movq $0, %r13
+  movq $0, %r14
+  movq $0, %r15
 
-  cmpb $10, %r9b
+  movb 0(%rax), %r8b
+  movb 1(%rax), %r9b
+
+  cmpq $10, %r9
   je oneDigit
   jmp twoDigits
 
   oneDigit:
-    subb $'0', %r8b
+    subq $'0', %r8
 
-    cmpb $1, %r8b
+    cmpq $1, %r8
     jb error
-    cmpb $9, %r8b
+    cmpq $9, %r8
     ja error
 
-    movb %r8b, %r10b
   jmp digitFunctionEnd
 
   twoDigits:
-    subb $'0', %r9b
-    subb $'0', %r8b
+    subq $'0', %r9
+    subq $'0', %r8
 
-    cmpb $1, %r9b
+    cmpq $1, %r9
     jb error
-    cmpb $9, %r9b
+    cmpq $9, %r9
     ja error
 
-    cmpb $1, %r8b
+    cmpq $1, %r8
     jb error
-    cmpb $9, %r8b
+    cmpq $9, %r8
     ja error
-
-    movb %r9b, %r10b
 
     movq %r8, %rax
     movq $10, %rdx
     mulq %rdx
-    addq %rax, %r10
+    movq %rax, %r8
+
+    addq %r9, %r8
   jmp digitFunctionEnd
 
   digitFunctionEnd:
-
-  movq %r10, %r8
-  movq $0, %r9
-  movq $0, %r10
 
   cmpq $1, %r8
   jb error
   cmpq $26, %r8
   ja error
+
+  # В %r8 хранится введеное число
 
   movq %r8, %rax
   addq $1, %rax
@@ -103,7 +102,11 @@ _start:
   mulq %rdx
   movq %rax, %r9
 
+  # В %r9 хранится длина выводимой строки
+
   movq %rsp, %r15
+
+  # В %r15 хранится адрес начала выводимой строки
 
   movq %r8, %r10
   movq $0, %r11
@@ -185,6 +188,8 @@ _start:
   popq %r8
 
   addq $INPUT, %rsp
+
+  r2:
 
   jmp exit
 
