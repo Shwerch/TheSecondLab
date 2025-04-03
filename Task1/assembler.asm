@@ -12,14 +12,17 @@ ERROR:
 .globl _start
 
 _start:
+  # Вывод приветственного сообщения
   movq $1, %rax
   movq $1, %rdi
   movq $MESSAGE, %rsi
   movq $MESSAGE_LEN, %rdx
   syscall
 
+  # Выделение INPUT байт в стеке
   subq $INPUT, %rsp
 
+  # Ввод строки длинной INPUT байт в стек
   movq $0, %rax
   movq $0, %rdi
   movq %rsp, %rsi
@@ -27,23 +30,26 @@ _start:
   movq $INPUT, %rdx
   syscall
 
+  # Вычисление адреса начала строки
   movq %rsp, %rax
   addq $INPUT, %rax
 
+  # Отправка символов в разные регистры
   movq $0, %r8
   movq $0, %r9
   movq $0, %r10
-
   movb 0(%rax), %r8b
   movb 1(%rax), %r9b
   movb 2(%rax), %r10b
 
+  # Проверка строки на наличие цифры
   cmpq $10, %r9
   je oneDigit
   cmpq $10, %r10
   je twoDigits
   jmp error
 
+  # Рассчет числа при одной введенной цифре
   oneDigit:
     subq $'0', %r8
 
@@ -51,9 +57,9 @@ _start:
     jb error
     cmpq $9, %r8
     ja error
-
   jmp digitFunctionEnd
 
+  # Рассчет числа при двух введенных цифрах
   twoDigits:
     subq $'0', %r9
     subq $'0', %r8
@@ -78,17 +84,20 @@ _start:
 
   digitFunctionEnd:
 
+  # Проверка числа на корректность
   cmpq $1, %r8
   jb error
   cmpq $26, %r8
   ja error
 
+  # Рассчет длины выводимой строки
   movq %r8, %rax
   addq $1, %rax
   movq %r8, %rdx
   mulq %rdx
   movq %rax, %r9
 
+  # Рассчет адреса начала выводимой строки
   movq %rsp, %r15
   addq $1, %r15
 
@@ -96,6 +105,7 @@ _start:
   movb $'\n', %al
   pushw %ax
 
+  # Добавление символов в строку в стеке
   movq %r8, %r10
   movq $0, %r11
   firstLoop:
@@ -134,6 +144,7 @@ _start:
 
   pushq %r15
 
+  # Вывод строки в консоль задом наперед, из конца в начало
   movq $1, %rax
   movq $1, %rdi
   movq %r15, %rsi
@@ -145,22 +156,26 @@ _start:
   subq $1, %r15
   addq $INPUT, %r15
 
+  # Очистка стека от данных
   movq %r15, %rsp
 
   jmp exit
 
 error:
+  # Вывод сообщения об ошибке
   movq $1, %rax
   movq $1, %rdi
   movq $ERROR, %rsi
   movq $ERROR_LEN, %rdx
   syscall
 
+  # Завершение работы программы с кодом 1
   movq $60, %rax
   movq $1, %rdi
   syscall
 
 exit:
+  # Завершение работы программы с кодом 0
   movq $60, %rax
   movq $0, %rdi
   syscall
