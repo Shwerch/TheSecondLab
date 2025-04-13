@@ -1,1 +1,0 @@
-as --64 assembler.asm -o assembler.o && ld -s -melf_x86_64 assembler.o -o assembler && ./assembler; rm assembler.o; rm assembler
