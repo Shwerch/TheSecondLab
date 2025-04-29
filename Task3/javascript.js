@@ -1,39 +1,42 @@
-const input = prompt("Enter the string of numbers with ' ' separator: ");
-
-const separators = [-1];
-for (let i = 0; i < input.length; i++) {
-    if (input[i] === ' ') {
-        separators.push(i);
-    }
-}
-separators.push(input.length);
-
-const numbers = [];
-for (let i = 0; i < separators.length - 1; i++) {
-    numbers.push([]);
-    for (let k = separators[i] + 1; k < separators[i + 1]; k++) {
-        numbers[i].push(input[k]);
-    }
+function enterPositiveNumber() {
+	let number;
+	while (true) {
+		number = parseInt(prompt("Enter a positive number: "));
+		if (number < 1) {
+			console.log("The number must be positive!");
+		} else {
+			break;
+		}
+	}
+	return number;
 }
 
-const answer = [];
-for (let i = 0; i < numbers.length; i++) {
-    let summ = 0, multi = 1;
-    for (const j of numbers[i]) {
-        const num = j - '0';
-        if (num < 0 || num > 9) {
-            console.log("You should have entered the numbers!");
-            return;
-        }
-        summ += num;
-        multi *= num;
-    }
-    if (summ < multi) {
-        answer.push(i);
-    }
+function enterCorrectNumbers(count) {
+	const correctNumbers = [];
+	for (let i = 0; i < count; i++) {
+		let summ = 0,
+			multi = 1;
+		let number = enterPositiveNumber();
+		while (number > 0) {
+			const digit = number % 10;
+			summ += digit;
+			multi *= digit;
+			number = Math.floor(number / 10);
+		}
+		if (summ < multi) {
+			correctNumbers.push(i);
+		}
+	}
+	return correctNumbers;
 }
 
-console.log(answer.join(' '));
-if (answer.length > 0) {
-    console.log();
+const count = enterPositiveNumber();
+console.log("Enter numbers greater than zero:");
+const correctNumbers = enterCorrectNumbers(count);
+console.log();
+
+if (correctNumbers.length > 0) {
+	console.log(correctNumbers.join(" "));
+} else {
+	console.log("There are no numbers that match the condition");
 }

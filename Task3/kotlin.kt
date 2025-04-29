@@ -1,41 +1,42 @@
-fun main() {
-    print("Enter the string of numbers with ' ' separator: ")
-    val input = readLine()!!
-
-    val separators = mutableListOf(-1)
-    for (i in input.indices) {
-        if (input[i] == ' ') {
-            separators.add(i)
-        }
+fun enterPositiveNumber(): Int {
+    var number: Int
+    while (true) {
+        number = readLine()!!.toInt()
+        if (number < 1) {
+            println("The number must be positive!")
+        } else break
     }
-    separators.add(input.length)
+    return number
+}
 
-    val numbers = mutableListOf<MutableList<Char>>()
-    for (i in 0 until separators.size - 1) {
-        numbers.add(mutableListOf())
-        for (k in (separators[i] + 1)..(separators[i + 1] - 1)) {
-            numbers[i].add(input[k])
-        }
-    }
-
-    val answer = mutableListOf<Int>()
-    for (i in numbers.indices) {
+fun enterCorrectNumbers(count: Int): List<Int> {
+    val correctNumbers = mutableListOf<Int>()
+    for (i in 0 until count) {
         var summ = 0
         var multi = 1
-        for (j in numbers[i]) {
-            val num = j - '0'
-            if (num < 0 || num > 9) {
-                println("You should have entered the numbers!")
-                return
-            }
-            summ += num
-            multi *= num
+        val number = enterPositiveNumber()
+        var temp = number
+        while (temp > 0) {
+            val digit = temp % 10
+            summ += digit
+            multi *= digit
+            temp /= 10
         }
-        if (summ < multi) {
-            answer.add(i)
-        }
+        if (summ < multi) correctNumbers.add(i)
     }
+    return correctNumbers
+}
 
-    println(answer.joinToString(" "))
-    if (answer.isNotEmpty()) println()
+fun main() {
+    println("Enter the positive number of numbers to be entered: ")
+    val count = enterPositiveNumber()
+    println("Enter numbers greater than zero: ")
+    val correctNumbers = enterCorrectNumbers(count)
+    println()
+
+    if (correctNumbers.isNotEmpty()) {
+        println(correctNumbers.joinToString(" "))
+    } else {
+        println("There are no numbers that match the condition")
+    }
 }

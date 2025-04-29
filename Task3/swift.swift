@@ -1,55 +1,56 @@
 import Foundation
 
-extension String: Error {}
+func enterPositiveNumber() -> Int {
+    var number: Int
 
-print("Enter the string of numbers with ' ' separator: ", terminator: "")
-if let input = readLine() {
-
-    var separators: [Int] = [-1]
-
-    for (i, char) in input.enumerated() {
-        if char == " " {
-            separators.append(i)
+    repeat {
+        if let input = readLine(), let num = Int(input), num > 0 {
+            return num
+        } else {
+            print("The number must be positive!")
         }
-    }
 
-    separators.append(input.count)
+    } while true
+}
 
-    var numbers: [[Character]] = []
-    
-    for i in 0..<separators.count - 1 {
-        var numberSegment: [Character] = []
-        
-        for k in (separators[i] + 1)..<separators[i + 1] {
-            numberSegment.append(input[input.index(input.startIndex, offsetBy: k)])
-        }
-        
-        numbers.append(numberSegment)
-    }
+func enterCorrectNumbers(count: Int) -> [Int] {
+    var correctNumbers: [Int] = []
 
-    var answer: [Int] = []
+    for i in 0..<count {
+        var summ = 0, multi = 1
 
-    for (i, number) in numbers.enumerated() {
-        var summ = 0
-        var multi = 1
-        
-        for j in number {
-            let num: Int? = Int(String(j))
-            
-            guard let n = num else {
-                print("You should have entered the numbers!")
-                throw "You should have entered the numbers!"
-            }
+        let number = enterPositiveNumber()
 
-            summ += n
-            multi *= n
+        var tempNumber = number
+
+        while tempNumber > 0 {
+            let digit = tempNumber % 10
+
+            summ += digit
+            multi *= digit
+
+            tempNumber /= 10
         }
 
         if summ < multi {
-            answer.append(i)
+            correctNumbers.append(i)
         }
+
     }
 
-    print(answer.map { String($0) }.joined(separator: " "))
-    if !answer.isEmpty { print("") }
+    return correctNumbers
 }
+
+print("Enter the positive number of numbers to be entered: ")
+let count = enterPositiveNumber()
+print("Enter numbers greater than zero: ")
+let correctNumbers = enterCorrectNumbers(count: count)
+
+print()
+
+if !correctNumbers.isEmpty {
+   print(correctNumbers.map { String($0) }.joined(separator: " "))
+} else {
+   print("There are no numbers that match the condition")
+}
+print()

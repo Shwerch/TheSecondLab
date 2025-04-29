@@ -1,34 +1,42 @@
-print "Enter the string of numbers with ' ' separator: "
-input = gets.chomp
-
-separators = [-1]
-input.chars.each_with_index do |char, i|
-    separators << i if char == ' '
-end
-separators << input.length
-
-numbers = []
-(0...separators.size - 1).each do |i|
-    numbers << []
-    (separators[i] + 1...separators[i + 1]).each do |k|
-        numbers[i] << input[k]
+def enter_positive_number
+  loop do
+    number = gets.to_i
+    if number < 1
+      puts "The number must be positive!"
+    else
+      return number
     end
+  end
 end
 
-answer = []
-(0...numbers.size).each do |i|
+def enter_correct_numbers(count)
+  correct_numbers = []
+
+  count.times do |i|
     summ, multi = 0, 1
-    numbers[i].each do |j|
-        num = j.ord - '0'.ord
-        if num < 0 || num > 9
-            puts "You should have entered the numbers!"
-            exit
-        end
-        summ += num
-        multi *= num
+    number = enter_positive_number
+
+    while number > 0 do
+      digit = number % 10
+      summ += digit
+      multi *= digit
+      number /= 10
     end
-    answer << i if summ < multi
+
+    correct_numbers << i if summ < multi
+  end
+
+  correct_numbers
 end
 
-puts answer.join(' ')
-puts if answer.any?
+puts "Enter the positive number of numbers to be entered: "
+count = enter_positive_number
+puts "Enter numbers greater than zero: "
+correct_numbers = enter_correct_numbers(count)
+puts
+
+if !correct_numbers.empty?
+  puts correct_numbers.join(' ')
+else
+  puts "There are no numbers that match the condition"
+end

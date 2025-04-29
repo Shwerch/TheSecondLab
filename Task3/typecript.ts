@@ -1,43 +1,43 @@
-const input: string = prompt("Enter the string of numbers with ' ' separator: ") || "-";
+function enterPositiveNumber(): number {
+	let number: number;
 
-const separators: number[] = [-1];
-for (let i = 0; i < input.length; i++) {
-    if (input[i] === ' ') {
-        separators.push(i);
-    }
-}
-separators.push(input.length);
-
-const numbers: string[][] = [];
-for (let i = 0; i < separators.length - 1; i++) {
-    const segment: string[] = [];
-    for (let k = separators[i] + 1; k < separators[i + 1]; k++) {
-        segment.push(input[k]);
-    }
-    numbers.push(segment);
+	while (true) {
+		const input = prompt("Enter a positive number: ");
+		if (input !== null) {
+			// check for null in case of canceling prompt.
+			number = parseInt(input);
+			if (number < 1) {
+				console.log("The number must be positive!");
+			} else break;
+		}
+	}
+	return number;
 }
 
-const answer: number[] = [];
-for (let i = 0; i < numbers.length; i++) {
-    let summ = 0;
-    let multi = 1;
-    
-    for (const j of numbers[i]) {
-        const num: number = parseInt(j);
-        
-        if (isNaN(num) || num < 0 || num > 9) {
-            console.log("You should have entered the numbers!");
-            throw new Error("You should have entered the numbers!");
-        }
+function enterCorrectNumbers(count: number): Array<number> {
+	const correctNumbers: Array<number> = [];
+	for (let i = 0; i < count; i++) {
+		let summ = 0,
+			multi = 1;
+		const number: number = enterPositiveNumber();
+		let tempNumber: number = number;
 
-       summ += num;
-       multi *= num;
-   }
+		while (tempNumber > 0) {
+			const digit: number = tempNumber % 10;
+			summ += digit;
+			multi *= digit;
+			tempNumber = Math.floor(tempNumber / 10);
+		}
 
-   if (summ < multi) {
-       answer.push(i);
-   }
+		if (summ < multi) correctNumbers.push(i);
+	}
+	return correctNumbers;
 }
 
-console.log(answer.join(' '));
-if (answer.length > 0) console.log();
+const count: number = enterPositiveNumber();
+console.log("Enter numbers greater than zero:");
+const correctNumbers: Array<number> = enterCorrectNumbers(count);
+console.log();
+
+if (correctNumbers.length > 0) console.log(correctNumbers.join(" "));
+else console.log("There are no numbers that match the condition");

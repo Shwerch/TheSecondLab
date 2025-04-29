@@ -1,43 +1,46 @@
 <?php
 
-echo "Enter the string of numbers with ' ' separator: ";
-$input = trim(fgets(STDIN));
-
-$separators = [-1];
-for ($i = 0; $i < strlen($input); $i++) {
-    if ($input[$i] === ' ') {
-        $separators[] = $i;
+function enterPositiveNumber() {
+    $number = 0;
+    while (true) {
+        $number = intval(readline());
+        if ($number < 1) {
+            echo "The number must be positive!\n";
+        } else break;
     }
-}
-$separators[] = strlen($input);
-
-$numbers = [];
-for ($i = 0; $i < count($separators) - 1; $i++) {
-    $numbers[] = [];
-    for ($k = $separators[$i] + 1; $k < $separators[$i + 1]; $k++) {
-        $numbers[$i][] = $input[$k];
-    }
+    return $number;
 }
 
-$answer = [];
-for ($i = 0; $i < count($numbers); $i++) {
-    $summ = 0;
-    $multi = 1;
-    foreach ($numbers[$i] as $j) {
-        $num = ord($j) - ord('0');
-        if ($num < 0 || $num > 9) {
-            echo "You should have entered the numbers!\n";
-            return;
+function enterCorrectNumbers($count) {
+    $correctNumbers = [];
+    for ($i = 0; $i < $count; $i++) {
+        $summ = 0;
+        $multi = 1;
+        $number = enterPositiveNumber();
+
+        while ($number > 0) {
+            $digit = $number % 10;
+            $summ += $digit;
+            $multi *= $digit;
+            $number /= 10;
+            $number = intval($number); // Convert to integer to avoid float issues.
         }
-        $summ += $num;
-        $multi *= $num;
+
+        if ($summ < $multi) array_push($correctNumbers, $i);
     }
-    if ($summ < $multi) {
-        $answer[] = $i;
-    }
+    return $correctNumbers;
 }
 
-echo implode(" ", $answer);
-if (count($answer) > 0) echo "\n";
+echo "Enter the positive number of numbers to be entered: ";
+$count = enterPositiveNumber();
+echo "Enter numbers greater than zero: ";
+$correctNumbers = enterCorrectNumbers($count);
+echo "\n";
 
+if (!empty($correctNumbers)) {
+    echo implode(" ", $correctNumbers);
+} else {
+    echo "There are no numbers that match the condition";
+}
+echo "\n";
 ?>
