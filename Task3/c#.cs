@@ -3,50 +3,54 @@ using System.Collections.Generic;
 
 class Program
 {
-    static void Main()
+    static int EnterPositiveNumber()
     {
-        Console.Write("Enter the string of numbers with ' ' separator: ");
-        string input = Console.ReadLine();
-
-        List<int> separators = new List<int> { -1 };
-        for (int i = 0; i < input.Length; i++)
+        int number = 0;
+        while (true)
         {
-            if (input[i] == ' ')
-                separators.Add(i);
+            if (int.TryParse(Console.ReadLine(), out number) && number > 0)
+                break;
+            Console.WriteLine("The number must be positive!");
         }
-        separators.Add(input.Length);
+        return number;
+    }
 
-        List<List<char>> numbers = new List<List<char>>();
-        for (int i = 0; i < separators.Count - 1; i++)
-        {
-            numbers.Add(new List<char>());
-            for (int k = separators[i] + 1; k < separators[i + 1]; k++)
-                numbers[i].Add(input[k]);
-        }
-
-        List<int> answer = new List<int>();
-        for (int i = 0; i < numbers.Count; i++)
+    static List<int> EnterCorrectNumbers(int count)
+    {
+        List<int> correctNumbers = new List<int>();
+        for (int i = 0; i < count; i++)
         {
             int summ = 0, multi = 1;
-            foreach (char j in numbers[i])
+            int number;
+            do
             {
-                int num = j - '0';
-                if (num < 0 || num > 9)
+                number = EnterPositiveNumber();
+                int temp = number;
+                while (temp > 0)
                 {
-                    Console.WriteLine("You should have entered the numbers!");
-                    return;
+                    int digit = temp % 10;
+                    summ += digit;
+                    multi *= digit;
+                    temp /= 10;
                 }
-                summ += num;
-                multi *= num;
-            }
+            } while (number <= 0);
             if (summ < multi)
-                answer.Add(i);
+                correctNumbers.Add(i);
         }
+        return correctNumbers;
+    }
 
-        foreach (int i in answer)
-            Console.Write(i + " ");
-        
-        if (answer.Count > 0)
-            Console.WriteLine();
+    static void Main()
+    {
+        Console.Write("Enter the positive number of numbers to be entered: ");
+        int number = EnterPositiveNumber();
+        Console.Write("Enter numbers greater than zero: ");
+        List<int> correctNumbers = EnterCorrectNumbers(number);
+        Console.WriteLine();
+
+        if (correctNumbers.Count > 0)
+            Console.WriteLine(string.Join(" ", correctNumbers));
+        else
+            Console.WriteLine("There are no numbers that match the condition");
     }
 }

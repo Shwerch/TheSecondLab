@@ -3,50 +3,53 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the string of numbers with ' ' separator: ");
-        String input = scanner.nextLine();
 
-        List<Integer> separators = new ArrayList<>();
-        separators.add(-1);
-        for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) == ' ') {
-                separators.add(i);
+    static int enterPositiveNumber(Scanner scanner) {
+        int number = 0;
+        while (true) {
+            number = scanner.nextInt();
+            if (number < 1) {
+                System.out.println("The number must be positive!");
+            } else {
+                break;
             }
         }
-        separators.add(input.length());
+        return number;
+    }
 
-        List<List<Character>> numbers = new ArrayList<>();
-        for (int i = 0; i < separators.size() - 1; i++) {
-            numbers.add(new ArrayList<>());
-            for (int k = separators.get(i) + 1; k < separators.get(i + 1); k++) {
-                numbers.get(i).add(input.charAt(k));
-            }
-        }
-
-        List<Integer> answer = new ArrayList<>();
-        for (int i = 0; i < numbers.size(); i++) {
+    static List<Integer> enterCorrectNumbers(int count, Scanner scanner) {
+        List<Integer> correctNumbers = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
             int summ = 0, multi = 1;
-            for (char j : numbers.get(i)) {
-                int num = j - '0';
-                if (num < 0 || num > 9) {
-                    System.out.println("You should have entered the numbers!");
-                    return;
-                }
-                summ += num;
-                multi *= num;
+            int number = enterPositiveNumber(scanner);
+            while (number > 0) {
+                int digit = number % 10;
+                summ += digit;
+                multi *= digit;
+                number /= 10;
             }
             if (summ < multi) {
-                answer.add(i);
+                correctNumbers.add(i);
             }
         }
+        return correctNumbers;
+    }
 
-        for (int i : answer) {            System.out.print(i + " ");
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the positive number of numbers to be entered: ");
+        int number = enterPositiveNumber(scanner);
+        System.out.print("Enter numbers greater than zero: ");
+        List<Integer> correctNumbers = enterCorrectNumbers(number, scanner);
+        System.out.println();
+
+        if (!correctNumbers.isEmpty()) {
+            for (int num : correctNumbers) {
+                System.out.print(num + " ");
+            }
+        } else {
+            System.out.println("There are no numbers that match the condition");
         }
-        if (answer.size() > 0) {
-            System.out.println();
-        }
+        System.out.println();
     }
 }
-

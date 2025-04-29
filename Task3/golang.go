@@ -2,53 +2,53 @@ package main
 
 import (
  "fmt"
-  "bufio"
-  "os"
 )
 
-func main() {
- fmt.Print("Enter the string of numbers with ' ' separator:\n")
- input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
- input = input[:len(input)-1]
-
- separators := []int{-1}
- for i, char := range input {
-  if char == ' ' {
-   separators = append(separators, i)
+func enterPositiveNumber() int {
+ var number int
+ for {
+  fmt.Scan(&number)
+  if number < 1 {
+   fmt.Println("The number must be positive!")
+  } else {
+   break
   }
  }
- separators = append(separators, len(input))
+ return number
+}
 
- numbers := make([][]rune, len(separators)-1)
- for i := 0; i < len(separators)-1; i++ {
-  j := i + 1
-  numbers[i] = []rune{}
-  for k := separators[i] + 1; k < separators[j]; k++ {
-   numbers[i] = append(numbers[i], rune(input[k]))
-  }
- }
-
- answer := []int{}
- for i := 0; i < len(numbers); i++ {
-  summ := 0
-  multi := 1
-  for _, j := range numbers[i] {
-   num := int(j - '0')
-   if num < 0 || num > 9 {
-    fmt.Println("You should have entered the numbers!")
-    return
-   }
-   summ += num
-   multi *= num
+func enterCorrectNumbers(count int) []int {
+ correctNumbers := []int{}
+ for i := 0; i < count; i++ {
+  summ, multi := 0, 1
+  number := enterPositiveNumber()
+  temp := number
+  for temp > 0 {
+   digit := temp % 10
+   summ += digit
+   multi *= digit
+   temp /= 10
   }
   if summ < multi {
-   answer = append(answer, i)
+   correctNumbers = append(correctNumbers, i)
   }
  }
- for _, i := range answer {
-  fmt.Print(i, " ")
+ return correctNumbers
+}
+
+func main() {
+ fmt.Print("Enter the positive number of numbers to be entered: ")
+ number := enterPositiveNumber()
+ fmt.Print("Enter numbers greater than zero: ")
+ correctNumbers := enterCorrectNumbers(number)
+ fmt.Println()
+
+ if len(correctNumbers) > 0 {
+  for _, num := range correctNumbers {
+   fmt.Print(num, " ")
+  }
+ } else {
+  fmt.Println("There are no numbers that match the condition")
  }
- if len(answer) > 0 {
-  fmt.Println()
- }
+ fmt.Println()
 }
