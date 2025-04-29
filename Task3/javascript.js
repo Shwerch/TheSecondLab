@@ -30,6 +30,7 @@ function enterCorrectNumbers(count) {
 	return correctNumbers;
 }
 
+console.log("Enter the positive number of numbers to be entered: ");
 const count = enterPositiveNumber();
 console.log("Enter numbers greater than zero:");
 const correctNumbers = enterCorrectNumbers(count);

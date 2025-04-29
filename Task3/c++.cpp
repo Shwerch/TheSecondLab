@@ -4,8 +4,8 @@
 int enterPositiveNumber() {
 	int number = 0;
 	while (true) {
-		std::cin >> number;
 		std::cin.clear();
+		std::cin >> number;
 		if (number < 1)
 			std::cout << "The number must be positive!" << std::endl;
 		else
