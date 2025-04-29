@@ -1,45 +1,46 @@
 #include <iostream>
 #include <vector>
-#include <string>
+
+int enterPositiveNumber() {
+	int number = 0;
+	while (true) {
+		std::cin >> number;
+		std::cin.clear();
+		if (number < 1)
+			std::cout << "The number must be positive!" << std::endl;
+		else
+			break;
+	}
+	return number;
+}
+
+std::vector<int> enterCorrectNumbers(int number) {
+	std::vector<int> correctNumbers;
+	for (int i = 0; i < number; i++) {
+		int summ = 0, multi = 1;
+		for (int number = enterPositiveNumber(); number > 0; number /= 10) {
+			int digit = number % 10;
+			summ += digit;
+			multi *= digit;
+		}
+		if (summ < multi)
+			correctNumbers.push_back(i);
+	}
+	return correctNumbers;
+}
 
 int main() {
-    std::cout << "Enter the string of numbers with ' ' separator: ";
-    std::string input;
-    std::getline(std::cin, input);
+	std::cout << "Enter the positive number of numbers to be entered: ";
+	int number = enterPositiveNumber();
+	std::cout << "Enter a numbers greater than zero: ";
+	std::vector<int> correctNumbers = enterCorrectNumbers(number);
+	std::cout << std::endl;
+	if (!correctNumbers.empty())
+		for (int num : correctNumbers)
+			std::cout << num << " ";
+	else
+		std::cout << "There are no numbers that match the condition";
+	std::cout << std::endl;
 
-    std::vector<int> separators = {-1};
-    for (int i = 0; i < input.length(); i++)
-        if (input[i] == ' ')
-            separators.push_back(i);
-    separators.push_back(static_cast<int>(input.length()));
-
-    std::vector<std::vector<char>> numbers;
-    for (int i = 0; i < separators.size() - 1; i++) {
-        int j = i + 1;
-        numbers.emplace_back();
-        for (int k = separators[i] + 1; k < separators[j]; k++)
-            numbers[i].push_back(input[k]);
-    }
-
-    std::vector<int> answer;
-    for (int i = 0; i < numbers.size(); i++) {
-        int summ = 0, multi = 1;
-        for (const char j : numbers[i]) {
-            const int num = (j - '0');
-            if (num < 0 || num > 9) {
-                std::cout << "You should have entered the numbers!" << std::endl;
-                return 1;
-            }
-            summ += num;
-            multi *= num;
-        }
-        if (summ < multi)
-            answer.push_back(i);
-    }
-    for (int i: answer)
-        std::cout << i << " ";
-    if (answer.size())
-        std::cout << std::endl;
-
-    return 0;
+	return 0;
 }
